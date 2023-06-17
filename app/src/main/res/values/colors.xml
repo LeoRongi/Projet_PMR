@@ -2,7 +2,7 @@
 <resources>
     <color name="black">#FF000000</color>
     <color name="white">#FFFFFFFF</color>
-    <color name="background">#BDE7ED</color>
-    <color name="backgroundEdit">#DCE3E4</color>
+    <color name="background">#D0E3E6</color>
+    <color name="backgroundEdit">#DDFFFFFF</color>
     <color name="ConnexionBtn">#EA598A</color>
 </resources>
