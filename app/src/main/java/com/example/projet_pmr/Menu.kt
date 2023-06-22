@@ -3,8 +3,8 @@ package com.example.projet_pmr
 import android.content.Context
 import android.content.Intent
 import android.content.SharedPreferences
-import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -12,6 +12,7 @@ import android.widget.Button
 import android.widget.EditText
 import android.widget.TextView
 import android.widget.Toast
+import androidx.appcompat.app.AppCompatActivity
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.android.volley.Request
@@ -58,6 +59,7 @@ class Menu : AppCompatActivity() {
         // Configuration du bouton pour ajouter une nouvelle liste
         addButton = findViewById(R.id.buttonAddList)
         newListEditText = findViewById(R.id.editTextListName)
+        val MapButton = findViewById<Button>(R.id.buttonAffMap)
 
         addButton.setOnClickListener {
             val newListName = newListEditText.text.toString()
@@ -68,7 +70,14 @@ class Menu : AppCompatActivity() {
             }
         }
 
+        MapButton.setOnClickListener {
+            startActivity(Intent(applicationContext, MapActivity::class.java))
+        }
+
+
     }
+
+
 
     // Méthode pour ajouter une nouvelle liste
     private fun addNewList(listName: String , id: String) {
@@ -235,6 +244,8 @@ class Menu : AppCompatActivity() {
             e.printStackTrace()
         }
     }
+
+
 
 
 }

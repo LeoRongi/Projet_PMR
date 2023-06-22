@@ -48,4 +48,16 @@
 
     <include layout="@layout/top_layout"/>
 
+    <Button
+        android:id="@+id/buttonAffMap"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Afficher la carte"
+        app:layout_constraintBottom_toTopOf="@+id/linearLayout2"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.498"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="@+id/recyclerView"
+        app:layout_constraintVertical_bias="0.944" />
+
 </androidx.constraintlayout.widget.ConstraintLayout>

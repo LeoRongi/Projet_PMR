@@ -1,0 +1,122 @@
+[
+  {
+    "ligne": 0,
+    "colonne": 1,
+    "nom_produit": "Pommes"
+  },
+  {
+    "ligne": 0,
+    "colonne": 2,
+    "nom_produit": "Oranges"
+  },
+  {
+    "ligne": 0,
+    "colonne": 4,
+    "nom_produit": "Bananes"
+  },
+  {
+    "ligne": 0,
+    "colonne": 5,
+    "nom_produit": "Carottes"
+  },
+  {
+    "ligne": 0,
+    "colonne": 7,
+    "nom_produit": "Tomates"
+  },
+  {
+    "ligne": 0,
+    "colonne": 8,
+    "nom_produit": "Poivrons"
+  },
+  {
+    "ligne": 1,
+    "colonne": 1,
+    "nom_produit": "Oignons"
+  },
+  {
+    "ligne": 1,
+    "colonne": 2,
+    "nom_produit": "Ail"
+  },
+  {
+    "ligne": 1,
+    "colonne": 4,
+    "nom_produit": "Citrons"
+  },
+  {
+    "ligne": 1,
+    "colonne": 5,
+    "nom_produit": "Pommes de terre"
+  },
+  {
+    "ligne": 1,
+    "colonne": 7,
+    "nom_produit": "Laitue"
+  },
+  {
+    "ligne": 1,
+    "colonne": 8,
+    "nom_produit": "Brocolis"
+  },
+  {
+    "ligne": 2,
+    "colonne": 1,
+    "nom_produit": "Courgettes"
+  },
+  {
+    "ligne": 2,
+    "colonne": 2,
+    "nom_produit": "Champignons"
+  },
+  {
+    "ligne": 2,
+    "colonne": 4,
+    "nom_produit": "Pois"
+  },
+  {
+    "ligne": 2,
+    "colonne": 5,
+    "nom_produit": "Haricots verts"
+  },
+  {
+    "ligne": 2,
+    "colonne": 7,
+    "nom_produit": "Pêches"
+  },
+  {
+    "ligne": 2,
+    "colonne": 8,
+    "nom_produit": "Poires"
+  },
+  {
+    "ligne": 3,
+    "colonne": 1,
+    "nom_produit": "Fraises"
+  },
+  {
+    "ligne": 3,
+    "colonne": 2,
+    "nom_produit": "Raisins"
+  },
+  {
+    "ligne": 3,
+    "colonne": 4,
+    "nom_produit": "Ananas"
+  },
+  {
+    "ligne": 3,
+    "colonne": 5,
+    "nom_produit": "Melons"
+  },
+  {
+    "ligne": 3,
+    "colonne": 7,
+    "nom_produit": "Mangues"
+  },
+  {
+    "ligne": 3,
+    "colonne": 8,
+    "nom_produit": "Kiwi"
+  }
+]
