@@ -1,0 +1,60 @@
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:paddingLeft="16dp"
+    android:paddingTop="16dp"
+    android:paddingRight="16dp"
+    android:paddingBottom="16dp"
+    android:orientation="vertical"
+    tools:context=".Itineraire">
+
+    <com.example.projet_pmr.MapPanel
+        android:id="@+id/mapPanel"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1" />
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal">
+
+        <Button
+            android:id="@+id/generateButton"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Calculer"
+            android:textSize="12sp"
+            tools:ignore="TouchTargetSizeCheck,VisualLintBounds" />
+
+        <Button
+            android:id="@+id/drawButton"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Prochaine étape"
+            android:textSize="12sp"
+            tools:ignore="TouchTargetSizeCheck,VisualLintBounds" />
+
+        <EditText
+            android:id="@+id/nbArticle"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:hint="nombre_d_articles"
+            android:minHeight="48dp"
+            android:text="1"
+            android:autofillHints="1"
+            android:inputType="number"
+            android:textSize="12sp" />
+
+        <ImageButton
+            android:id="@+id/voiceButton"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:minWidth="48dp"
+            android:src="@drawable/ic_mic"
+            tools:ignore="ContentDescription,TouchTargetSizeCheck,ImageContrastCheck,SpeakableTextPresentCheck" />
+
+    </LinearLayout>
+
+</LinearLayout>

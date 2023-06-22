@@ -43,4 +43,8 @@
         libero vel nunc consequat, quis tincidunt nisl eleifend. Cras bibendum enim a justo luctus
         vestibulum. Fusce dictum libero quis erat maximus, vitae volutpat diam dignissim.
     </string>
+    <string name="generate">\n</string>
+    <string name="draw" />
+    <string name="nombre_d_articles" />
+    <string name="_1" />
 </resources>
