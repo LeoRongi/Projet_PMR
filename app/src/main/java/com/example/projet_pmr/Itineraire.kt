@@ -1,13 +1,13 @@
 package com.example.projet_pmr
 
 import android.annotation.SuppressLint
+import android.app.Activity
+import android.content.ActivityNotFoundException
 import android.content.Context
 import android.content.Intent
 import android.graphics.*
 import android.os.Bundle
-import android.speech.RecognitionListener
 import android.speech.RecognizerIntent
-import android.speech.SpeechRecognizer
 import android.util.AttributeSet
 import android.util.Log
 import android.view.View
@@ -15,144 +15,182 @@ import android.widget.Button
 import android.widget.EditText
 import android.widget.ImageButton
 import android.widget.Toast
+import androidx.activity.result.ActivityResult
+import androidx.activity.result.ActivityResultLauncher
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AppCompatActivity
+import androidx.core.content.ContextCompat
 import java.util.*
 
-class Itineraire : AppCompatActivity() {
-    private lateinit var speechRecognizer: SpeechRecognizer
-    private val map = arrayOf(
-        intArrayOf(0, 0, 0, 0, 0, 0, 0),
-        intArrayOf(1, 1, 1, 1, 1, 1, 1),
-        intArrayOf(1, 0, 0, 1, 0, 0, 1),
-        intArrayOf(1, 0, 0, 1, 0, 0, 1),
-        intArrayOf(1, 1, 1, 1, 1, 1, 1),
-        intArrayOf(1, 0, 0, 1, 0, 0, 1),
-        intArrayOf(1, 0, 0, 1, 0, 0, 1),
-        intArrayOf(1, 1, 1, 1, 1, 1, 1),
-        intArrayOf(1, 0, 0, 1, 0, 0, 1),
-        intArrayOf(1, 0, 0, 1, 0, 0, 1),
-        intArrayOf(1, 1, 1, 1, 1, 1, 1),
-        intArrayOf(1, 0, 0, 1, 0, 0, 1),
-        intArrayOf(1, 0, 0, 1, 0, 0, 1),
-        intArrayOf(1, 1, 1, 1, 1, 1, 1),
-        intArrayOf(0, 0, 0, 0, 0, 0, 1),
+val map = arrayOf(
+    intArrayOf(0, 0, 0, 0, 0, 0, 0, 0),
+    intArrayOf(1, 1, 1, 1, 1, 1, 1, 1),
+    intArrayOf(1, 0, 0, 1, 0, 0, 1, 1),
+    intArrayOf(1, 0, 0, 1, 0, 0, 1, 1),
+    intArrayOf(1, 1, 1, 1, 1, 1, 1, 1),
+    intArrayOf(1, 0, 0, 1, 0, 0, 1, 1),
+    intArrayOf(1, 0, 0, 1, 0, 0, 1, 1),
+    intArrayOf(1, 1, 1, 1, 1, 1, 1, 1),
+    intArrayOf(1, 0, 0, 1, 0, 0, 1, 1),
+    intArrayOf(1, 0, 0, 1, 0, 0, 1, 1),
+    intArrayOf(1, 1, 1, 1, 1, 1, 1, 1),
+    intArrayOf(1, 0, 0, 1, 0, 0, 1, 1),
+    intArrayOf(1, 0, 0, 1, 0, 0, 1, 1),
+    intArrayOf(1, 1, 1, 1, 1, 1, 1, 1),
+    intArrayOf(0, 0, 0, 0, 0, 0, 0, 1),
+)
+val zigzag = listOf(
+    Point(13, 6),
+    Point(13, 5),
+    Point(13, 4),
+    Point(13, 3),
+    Point(13, 2),
+    Point(13, 1),
+    Point(13, 0),
+    Point(12, 0),
+    Point(11, 0),
+    Point(10, 0),
+    Point(10, 1),
+    Point(10, 2),
+    Point(10, 3),
+    Point(10, 4),
+    Point(10, 5),
+    Point(10, 6),
+    Point(9, 6),
+    Point(8, 6),
+    Point(7, 6),
+    Point(7, 5),
+    Point(7, 4),
+    Point(7, 3),
+    Point(7, 2),
+    Point(7, 1),
+    Point(7, 0),
+    Point(6, 0),
+    Point(5, 0),
+    Point(4, 0),
+    Point(4, 1),
+    Point(4, 2),
+    Point(4, 3),
+    Point(4, 4),
+    Point(4, 5),
+    Point(4, 6),
+    Point(3, 6),
+    Point(2, 6),
+    Point(2, 7),
+    Point(1, 7),
+    Point(1, 6),
+    Point(1, 5),
+    Point(1, 4),
+    Point(1, 3),
+    Point(1, 2),
+    Point(1, 1),
+    Point(1, 0)
+)
 
-        )
-    private val startPoint = Point(map.size - 1, map[0].size - 1)
-    private val endPoint = Point(6, map[0].size - 1)
-    private val zigzag = listOf(
-        Point(13, 6),
-        Point(13, 5),
-        Point(13, 4),
-        Point(13, 3),
-        Point(13, 2),
-        Point(13, 1),
-        Point(13, 0),
-        Point(12, 0),
-        Point(11, 0),
-        Point(10, 0),
-        Point(10, 1),
-        Point(10, 2),
-        Point(10, 3),
-        Point(10, 4),
-        Point(10, 5),
-        Point(10, 6),
-        Point(9, 6),
-        Point(8, 6),
-        Point(7, 6),
-        Point(7, 5),
-        Point(7, 4),
-        Point(7, 3),
-        Point(7, 2),
-        Point(7, 1),
-        Point(7, 0),
-        Point(6, 0),
-        Point(5, 0),
-        Point(4, 0),
-        Point(4, 1),
-        Point(4, 2),
-        Point(4, 3),
-        Point(4, 4),
-        Point(4, 5),
-        Point(4, 6),
-        Point(3, 6),
-        Point(2, 6),
-        Point(1, 6),
-        Point(1, 5),
-        Point(1, 4),
-        Point(1, 3),
-        Point(1, 2),
-        Point(1, 1),
-        Point(1, 0)
-    )
+val ligne = map.size
+val colonne = map[0].size
+val startPoint = Point(ligne - 1, colonne - 1)
+val endPoint = Point(7, colonne-1)
+
+class Itineraire : AppCompatActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_itineraire)
 
+        lateinit var activityResultLauncher: ActivityResultLauncher<Intent>
+
         val mapPanel: MapPanel = findViewById(R.id.mapPanel)
         val generateButton: Button = findViewById(R.id.generateButton)
-        val drawButton: Button = findViewById(R.id.drawButton)
+        val nextStep: Button = findViewById(R.id.nextStep)
+        val previousStep: Button = findViewById(R.id.previousStep)
         val editText: EditText = findViewById(R.id.nbArticle)
         val voiceButton: ImageButton = findViewById(R.id.voiceButton)
-        mapPanel.setMap(map)
 
-        generateButton.setOnClickListener {
-            Log.i("Nouvelle génération", "_____________________________________________________________________")
-            var currentStep = 0
-            val randomPoints = generateRandomPoints(editText.text.toString().toInt(), map)
-            val randomCheckpoints = checkpoints(randomPoints)
-            val (optimalOrder, optimalPath) = sortCheckpoints(randomCheckpoints)
-            var currentPath = optimalPath[currentStep]
-            mapPanel.setPoints(randomPoints, randomCheckpoints, optimalOrder, currentPath)
-            drawButton.setOnClickListener {
-                if (currentStep + 1 > optimalPath.size - 1) {
-                    Toast.makeText(this, "Fin du trajet", Toast.LENGTH_SHORT).show()
-                } else {
-                    currentStep += 1
-                    currentPath = optimalPath[currentStep]
-                    mapPanel.setPath(currentPath)
-                }
+        voiceButton.setOnClickListener{
+            val intent = Intent(RecognizerIntent.ACTION_RECOGNIZE_SPEECH)
+            intent.putExtra(RecognizerIntent.EXTRA_LANGUAGE_MODEL,RecognizerIntent.LANGUAGE_MODEL_FREE_FORM)
+            intent.putExtra(RecognizerIntent.EXTRA_LANGUAGE,Locale.getDefault())
+            intent.putExtra(RecognizerIntent.EXTRA_PROMPT,"Say something...")
+            try {
+                activityResultLauncher.launch(intent)
+            }catch (exp:ActivityNotFoundException)
+            {
+                Toast.makeText(applicationContext,"Device not supported", Toast.LENGTH_SHORT).show()
             }
         }
-
-        speechRecognizer = SpeechRecognizer.createSpeechRecognizer(this)
-        val recognitionIntent = Intent(RecognizerIntent.ACTION_RECOGNIZE_SPEECH)
-        recognitionIntent.putExtra(RecognizerIntent.EXTRA_LANGUAGE_MODEL, RecognizerIntent.LANGUAGE_MODEL_FREE_FORM)
-
-        // Set click listener for the voiceButton
-        voiceButton.setOnClickListener {
-            // Start speech recognition when voiceButton is clicked
-            speechRecognizer.startListening(recognitionIntent)
-        }
-        // Set recognition listener for the speechRecognizer
-        speechRecognizer.setRecognitionListener(object : RecognitionListener {
-            override fun onReadyForSpeech(params: Bundle?) {}
-
-            override fun onBeginningOfSpeech() {}
-
-            override fun onRmsChanged(rmsdB: Float) {}
-
-            override fun onBufferReceived(buffer: ByteArray?) {}
-
-            override fun onEndOfSpeech() {}
-
-            override fun onError(error: Int) {}
-
-            override fun onResults(results: Bundle?) {
-                val voiceResults = results?.getStringArrayList(SpeechRecognizer.RESULTS_RECOGNITION)
-                voiceResults?.get(0)?.let { result ->
-                    // Check if the recognized speech is "générer" and trigger generateButton click event
-                    if (result == "générer") {
+        activityResultLauncher = registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result: ActivityResult? ->
+            if (result?.resultCode == Activity.RESULT_OK && result.data != null) {
+                val speechText = result.data?.getStringArrayListExtra(RecognizerIntent.EXTRA_RESULTS) as ArrayList<String>
+                val words = speechText[0].split(" ")
+                Log.i("speechText", words.toString())
+                when (words[0]) {
+                    "générer" -> {
                         generateButton.performClick()
+                    }
+                    "suivant" -> {
+                        nextStep.performClick()
+                    }
+                    "précédent" -> {
+                        previousStep.performClick()
+                    }
+                    "article", "articles" -> {
+
+                        if (words[1].toIntOrNull() != null) {
+                            editText.setText(words[1])
+                        }
+                        else Toast.makeText(applicationContext, "Le mot qui suit article doit être un entier", Toast.LENGTH_SHORT).show()
+
+                    }
+                    else -> {
+                        Toast.makeText(applicationContext, "Commande inconnue", Toast.LENGTH_SHORT).show()
                     }
                 }
             }
+        }
 
-            override fun onPartialResults(partialResults: Bundle?) {}
 
-            override fun onEvent(eventType: Int, params: Bundle?) {}
-        })
+
+        mapPanel.setMap(map)
+        val pointsToHide = mutableListOf<Point>()
+        generateButton.setOnClickListener {
+            Log.i("Nouvelle génération", "_____________________________________________________________________")
+            var currentStep = 0
+            pointsToHide.clear()
+
+
+            val randomPoints = generateRandomPoints(editText.text.toString().toInt(), map)
+
+
+            val checkPoints = checkpoints(randomPoints)
+            val (optimalOrder, optimalPath) = sortCheckpoints(checkPoints)
+            var currentPath = optimalPath[currentStep]
+
+            mapPanel.setPoints(randomPoints, checkPoints, optimalOrder, currentPath)
+
+            nextStep.setOnClickListener {
+                if (currentStep +1 > optimalPath.size-1) {
+                    Toast.makeText(this, "Fin du trajet", Toast.LENGTH_SHORT).show()
+                } else {
+                    pointsToHide.add(currentPath[0])
+                    currentStep += 1
+                    currentPath = optimalPath[currentStep]
+                    mapPanel.setPath(currentPath)
+                    mapPanel.setHiddenCheckpoints(pointsToHide)
+                }
+            }
+            previousStep.setOnClickListener {
+                if (currentStep -1 < 0) {
+                    Toast.makeText(this, "Début du trajet", Toast.LENGTH_SHORT).show()
+                } else {
+                    currentStep -= 1
+                    currentPath = optimalPath[currentStep]
+                    pointsToHide.removeAt(pointsToHide.size-1)
+                    mapPanel.setPoints(randomPoints, checkPoints, optimalOrder, currentPath)
+                    mapPanel.setHiddenCheckpoints(pointsToHide)
+                }
+            }
+        }
     }
 
 
@@ -198,7 +236,8 @@ class Itineraire : AppCompatActivity() {
     }
 
     private fun sortCheckpoints(checkpoints: List<Point>): Pair<List<Point>, List<List<Point>>> {
-        val sortedCheckpoints = checkpoints.sortedBy { zigzag.indexOf(it) }
+
+        val sortedCheckpoints = checkpoints.sortedBy{-it.x}.sortedBy { zigzag.indexOf(it) }
         val permutations = mutableListOf<List<Point>>()
         var (shortestDistance,premierPath) = calculateTotalDistance(startPoint,endPoint,sortedCheckpoints)
         Log.i("Premiere distance", shortestDistance.toString())
@@ -278,7 +317,7 @@ class Itineraire : AppCompatActivity() {
 
 
 
-    fun calculateDistance(matrix: Array<IntArray>, p1: Point, p2: Point): Pair<Int, List<Point>> {
+    private fun calculateDistance(matrix: Array<IntArray>, p1: Point, p2: Point): Pair<Int, List<Point>> {
         val startX = p1.x
         val startY = p1.y
         val endX = p2.x
@@ -290,7 +329,7 @@ class Itineraire : AppCompatActivity() {
         if (startX < 0 || startX >= rows || startY < 0 || startY >= columns ||
             endX < 0 || endX >= rows || endY < 0 || endY >= columns
         ) {
-            throw IllegalArgumentException("Invalid start or end coordinates")
+            throw IllegalArgumentException("sX : $startX, sY : $startY, eX : $endX, eY : $endY, rows : $rows, col : $columns")
         }
 
         // Vérifier si les coordonnées de départ et d'arrivée sont walkable
@@ -386,12 +425,17 @@ class MapPanel(context: Context, attrs: AttributeSet?) : View(context, attrs) {
     private val squareSize = 100
     private val wallColor = Color.BLACK
     private val floorColor = Color.WHITE
+    private val red = ContextCompat.getColor(context, R.color.red)
+    private val blue = ContextCompat.getColor(context, R.color.blue)
 
     private var map: Array<IntArray>? = null
     private var randomPoints: List<Point>? = null
     private var checkpoints: List<Point>? = null
     private var orderedCheckpoints: List<Point>? = null
     private var currentPath : List<Point>? = null
+    private var hiddenCheckpoints : List<Point>? = null
+
+
 
     fun setMap(map: Array<IntArray>) {
         this.map = map
@@ -410,11 +454,18 @@ class MapPanel(context: Context, attrs: AttributeSet?) : View(context, attrs) {
         invalidate()
     }
 
+    fun setHiddenCheckpoints(hiddenCheckpoints: List<Point>) {
+        this.hiddenCheckpoints = hiddenCheckpoints
+        invalidate()
+    }
+
+
 
 
     @SuppressLint("DrawAllocation")
     override fun onDraw(canvas: Canvas) {
         super.onDraw(canvas)
+
 
         map?.let {
             val paint = Paint()
@@ -427,8 +478,8 @@ class MapPanel(context: Context, attrs: AttributeSet?) : View(context, attrs) {
                     }
                     paint.color = color
                     canvas.drawRect(
-                        j * squareSize.toFloat(),
-                        i * squareSize.toFloat(),
+                        j * squareSize.toFloat()+2,
+                        i * squareSize.toFloat()+2,
                         (j + 1) * squareSize.toFloat(),
                         (i + 1) * squareSize.toFloat(),
                         paint
@@ -439,33 +490,34 @@ class MapPanel(context: Context, attrs: AttributeSet?) : View(context, attrs) {
 
         randomPoints?.let {
             val randomPointPaint = Paint()
-            randomPointPaint.color = Color.RED
+            randomPointPaint.color = red
+            randomPointPaint.strokeWidth = 8f // Épaisseur des lignes de la croix
 
             for (point in it) {
-                canvas.drawRect(
-                    point.y * squareSize.toFloat(),
-                    point.x * squareSize.toFloat(),
-                    (point.y + 1) * squareSize.toFloat(),
-                    (point.x + 1) * squareSize.toFloat(),
-                    randomPointPaint
-                )
+                val centerX = (point.y + 0.5f) * squareSize.toFloat()
+                val centerY = (point.x + 0.5f) * squareSize.toFloat()
+
+                // Tracer les lignes horizontales et verticales
+                canvas.drawLine(centerX - squareSize / 4f, centerY, centerX + squareSize / 4f, centerY, randomPointPaint)
+                canvas.drawLine(centerX, centerY - squareSize / 4f, centerX, centerY + squareSize / 4f, randomPointPaint)
             }
         }
 
+
         orderedCheckpoints?.let {
             val checkpointPaint = Paint()
-            checkpointPaint.color = Color.GREEN
+            checkpointPaint.color = blue
             val textPaint = Paint().apply {
                 color = Color.WHITE
-                textSize = 40f
+                textSize = 48f
                 textAlign = Paint.Align.CENTER
             }
 
             for ((index, point) in it.withIndex()) {
                 val text = if (index == 0) "Start" else if (index==it.size-1) "End" else (index).toString()
                 canvas.drawRect(
-                    point.y * squareSize.toFloat(),
-                    point.x * squareSize.toFloat(),
+                    point.y * squareSize.toFloat()+2,
+                    point.x * squareSize.toFloat()+2,
                     (point.y + 1) * squareSize.toFloat(),
                     (point.x + 1) * squareSize.toFloat(),
                     checkpointPaint
@@ -476,11 +528,52 @@ class MapPanel(context: Context, attrs: AttributeSet?) : View(context, attrs) {
                 canvas.drawText(text, textX, textY, textPaint)
             }
         }
+
+        hiddenCheckpoints?.let{
+            val hiddePointPaint = Paint()
+            val hiddeArticlePaint = Paint()
+            hiddePointPaint.color = Color.WHITE
+
+            for (point in it) {
+                canvas.drawRect(
+                    point.y * squareSize.toFloat() + 2,
+                    point.x * squareSize.toFloat() + 2,
+                    (point.y + 1) * squareSize.toFloat(),
+                    (point.x + 1) * squareSize.toFloat(),
+                    hiddePointPaint
+                )
+                if (0 < point.x && 0 < point.y && point.x < ligne - 1 && point.y < colonne ) {
+                    if (map!![point.x + 1][point.y] == 0) {
+                        canvas.drawRect(
+                            point.y * squareSize.toFloat() + 2,
+                            (point.x + 1) * squareSize.toFloat() + 2,
+                            (point.y + 1) * squareSize.toFloat(),
+                            (point.x + 2) * squareSize.toFloat(),
+                            hiddeArticlePaint
+                        )
+                    }
+                    if (map!![point.x - 1][point.y] == 0) {
+                        canvas.drawRect(
+                            point.y * squareSize.toFloat() + 2,
+                            (point.x - 1) * squareSize.toFloat() + 2,
+                            (point.y + 1) * squareSize.toFloat(),
+                            (point.x) * squareSize.toFloat(),
+                            hiddeArticlePaint
+                        )
+                    }
+                }
+            }
+        }
+
         currentPath?.let { path ->
             val pathPaint = Paint()
+            val startendPaint = Paint()
+            val pointRadius = squareSize / 3f
+            startendPaint.color = Color.YELLOW
             pathPaint.color = Color.BLUE
             pathPaint.style = Paint.Style.STROKE
-            pathPaint.strokeWidth = 10f
+            pathPaint.strokeWidth = 12f
+
 
             val pathPoints = path.map { point ->
                 PointF(
@@ -488,7 +581,6 @@ class MapPanel(context: Context, attrs: AttributeSet?) : View(context, attrs) {
                     (point.x + 0.5f) * squareSize.toFloat()
                 )
             }
-
             val pathPath = Path()
             if (pathPoints.isNotEmpty()) {
                 pathPath.moveTo(pathPoints[0].x, pathPoints[0].y)
@@ -496,11 +588,31 @@ class MapPanel(context: Context, attrs: AttributeSet?) : View(context, attrs) {
                     pathPath.lineTo(pathPoints[i].x, pathPoints[i].y)
                 }
             }
-
             canvas.drawPath(pathPath, pathPaint)
+
+            for ((index, point) in path.withIndex()) {
+                if (index == 0) {
+                    canvas.drawCircle(
+                        point.y * squareSize.toFloat() + 2 + squareSize / 2f,
+                        point.x * squareSize.toFloat() + 2
+                                + squareSize / 2f,
+                        pointRadius,
+                        Paint().apply {
+                            color = red
+                            style = Paint.Style.FILL
+                        }
+                    )
+                }
+                if (index == path.size - 1) {
+                    canvas.drawRect(
+                        point.y * squareSize.toFloat() + 2,
+                        point.x * squareSize.toFloat() + 2,
+                        (point.y + 1) * squareSize.toFloat(),
+                        (point.x + 1) * squareSize.toFloat(),
+                        startendPaint
+                    )
+                }
+            }
         }
-
-
     }
-
 }
