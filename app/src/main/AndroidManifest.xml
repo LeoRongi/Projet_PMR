@@ -26,6 +26,8 @@
         <activity
             android:name=".ShowListActivity"
             android:exported="false" />
+        <activity android:name=".Itineraire"
+            android:exported="false"/>
         <activity
             android:name=".CreateAccountActivity"
             android:exported="false"
