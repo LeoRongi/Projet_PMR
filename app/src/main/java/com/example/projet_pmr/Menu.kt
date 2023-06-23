@@ -71,7 +71,7 @@ class Menu : AppCompatActivity() {
         }
 
         MapButton.setOnClickListener {
-            startActivity(Intent(applicationContext, MapActivity::class.java))
+            startActivity(Intent(applicationContext, Itineraire::class.java))
         }
 
 
