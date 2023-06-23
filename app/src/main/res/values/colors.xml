@@ -5,4 +5,7 @@
     <color name="background">#D0E3E6</color>
     <color name="backgroundEdit">#DDFFFFFF</color>
     <color name="ConnexionBtn">#EA598A</color>
+    <color name="blue">#6ec2c9</color>
+    <color name="red">#cc0f38</color>
+    <color name="grey">#c9c5c5</color>
 </resources>
