@@ -7,53 +7,78 @@
     android:paddingRight="16dp"
     android:paddingBottom="16dp"
     android:orientation="vertical"
+    android:background="@color/grey"
     tools:context=".Itineraire">
 
     <com.example.projet_pmr.MapPanel
         android:id="@+id/mapPanel"
-        android:layout_width="match_parent"
-        android:layout_height="0dp"
-        android:layout_weight="1" />
+        android:layout_width="wrap_content"
+        android:layout_height="570dp"
+        android:layout_marginLeft="37dp"
+        android:backgroundTint="@color/grey"
+        android:background="@color/grey"/>
 
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:orientation="horizontal">
+        android:orientation="horizontal"
+        android:gravity="center_horizontal">
 
         <Button
             android:id="@+id/generateButton"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="Calculer"
-            android:textSize="12sp"
-            tools:ignore="TouchTargetSizeCheck,VisualLintBounds" />
-
-        <Button
-            android:id="@+id/drawButton"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="Prochaine étape"
-            android:textSize="12sp"
-            tools:ignore="TouchTargetSizeCheck,VisualLintBounds" />
+            android:textSize="14sp"
+            android:backgroundTint="@color/red"
+            android:layout_marginEnd="20dp" />
 
         <EditText
             android:id="@+id/nbArticle"
-            android:layout_width="wrap_content"
+            android:layout_width="50dp"
             android:layout_height="wrap_content"
-            android:hint="nombre_d_articles"
+            android:hint="Nb"
             android:minHeight="48dp"
-            android:text="1"
+            android:text="@string/_1"
             android:autofillHints="1"
             android:inputType="number"
-            android:textSize="12sp" />
+            android:textSize="20sp"
+            android:layout_marginEnd="20dp"
+            android:gravity="center"/>
 
         <ImageButton
             android:id="@+id/voiceButton"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:minWidth="48dp"
             android:src="@drawable/ic_mic"
             tools:ignore="ContentDescription,TouchTargetSizeCheck,ImageContrastCheck,SpeakableTextPresentCheck" />
+
+    </LinearLayout>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:gravity="center_horizontal">
+
+
+        <Button
+            android:id="@+id/previousStep"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Étape \nprécédente"
+            android:textSize="14sp"
+            android:backgroundTint="@color/blue"
+            android:layout_marginEnd="30dp"
+            tools:ignore="TouchTargetSizeCheck,VisualLintBounds" />
+        <Button
+            android:id="@+id/nextStep"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Étape \nsuivante"
+            android:backgroundTint="@color/blue"
+            android:textSize="14sp"
+            tools:ignore="TouchTargetSizeCheck,VisualLintBounds" />
 
     </LinearLayout>
 
