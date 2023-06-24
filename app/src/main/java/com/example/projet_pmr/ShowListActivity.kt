@@ -3,11 +3,12 @@ package com.example.projet_pmr
 import android.content.Intent
 import android.content.Context
 import android.content.SharedPreferences
-import android.content.res.Resources
+import android.graphics.Point
 import android.os.Bundle
 import android.speech.RecognitionListener
 import android.speech.RecognizerIntent
 import android.speech.SpeechRecognizer
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -22,21 +23,23 @@ import com.android.volley.Request
 import com.android.volley.Response
 import com.android.volley.toolbox.JsonObjectRequest
 import com.android.volley.toolbox.Volley
-import com.example.projet_pmr.R
 import com.google.gson.Gson
 import com.google.gson.reflect.TypeToken
+
 import org.json.JSONArray
 import org.json.JSONException
 import org.json.JSONObject
-import java.io.BufferedReader
-import java.io.File
+import java.io.IOException
+import java.io.InputStream
+import java.nio.charset.Charset
+
 
 class ShowListActivity : AppCompatActivity() {
 
     private lateinit var id: String
     private lateinit var itemList: MutableList<ListItem>
     private lateinit var itemAdapter: ItemListAdapter
-    private lateinit var coordinatesList: HashMap<Int, List<JSONObject>>
+    private lateinit var coordinatesList: MutableList<Point>
 
     private lateinit var recyclerView: RecyclerView
     private lateinit var addItemButton: Button
@@ -65,7 +68,9 @@ class ShowListActivity : AppCompatActivity() {
         val urlAPI = loadUrl()
 
         retrieveListItems(id, urlAPI)
-        coordinatesList = HashMap()
+
+
+
         recyclerView = findViewById(R.id.recyclerView)
         recyclerView.layoutManager = LinearLayoutManager(this)
         itemAdapter = ItemListAdapter(itemList)
@@ -73,6 +78,19 @@ class ShowListActivity : AppCompatActivity() {
 
         addItemButton = findViewById(R.id.buttonAddItem)
         newItemEditText = findViewById(R.id.editTextItem)
+
+        val startButton = findViewById<Button>(R.id.startNavigation)
+
+
+
+
+        startButton.setOnClickListener {
+            coordinatesList = mutableListOf()
+            getCoordinates()
+            val intent = Intent(applicationContext, Itineraire::class.java)
+            intent.putExtra("coordinatesList", ArrayList(coordinatesList))
+            startActivity(intent)
+        }
 
         addItemButton.setOnClickListener {
             val newItem = newItemEditText.text.toString()
@@ -84,18 +102,21 @@ class ShowListActivity : AppCompatActivity() {
 
         speechRecognizer = SpeechRecognizer.createSpeechRecognizer(this)
         if (!SpeechRecognizer.isRecognitionAvailable(this)) {
-            Toast.makeText(this, "La reconnaissance vocale n'est pas disponible sur cet appareil.", Toast.LENGTH_SHORT).show()
+            Toast.makeText(
+                this,
+                "La reconnaissance vocale n'est pas disponible sur cet appareil.",
+                Toast.LENGTH_SHORT
+            ).show()
             return
         }
         speechRecognizer.setRecognitionListener(object : RecognitionListener {
             override fun onReadyForSpeech(params: Bundle?) {
                 // Le service est prêt pour la parole
-                startListening()
+
             }
 
             override fun onBeginningOfSpeech() {
                 // Le début de la parole est détecté
-
             }
 
             override fun onRmsChanged(rmsdB: Float) {
@@ -128,8 +149,6 @@ class ShowListActivity : AppCompatActivity() {
                 // Un événement non spécifié est survenu
             }
         })
-
-        startListening()
 
 
     }
@@ -166,8 +185,7 @@ class ShowListActivity : AppCompatActivity() {
     }
 
 
-
-    inner class ItemListAdapter(private val itemList: MutableList<  ListItem>) :
+    inner class ItemListAdapter(private val itemList: MutableList<ListItem>) :
         RecyclerView.Adapter<ItemListAdapter.ItemViewHolder>() {
 
         override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ItemViewHolder {
@@ -311,37 +329,50 @@ class ShowListActivity : AppCompatActivity() {
     }
 
 
-
-    private fun getCoordinates(json: String) {
+    private fun getCoordinates() {
+        val cartographyJson = applicationContext.resources.openRawResource(R.raw.product).bufferedReader().use {
+            it.readText()
+        }
+        val cartographyArray = JSONArray(cartographyJson)
+        System.out.println(cartographyArray)
+        logItems()
         for (item in itemList) {
-            val coordinates = getCoordinatesByLabel(json, item.label)
+            val coordinates = getCoordinatesByLabel(cartographyArray, item.label)
             if (coordinates.isNotEmpty()) {
                 println("Les coordonnées du produit '${item.label}' sont :")
                 for (coordinate in coordinates) {
-                    println("Ligne: ${coordinate.getInt("ligne")}, Colonne: ${coordinate.getInt("colonne")}")
+                    val ligne = coordinate.getInt("ligne")
+                    val colonne = coordinate.getInt("colonne")
+                    println("Ligne: $ligne, Colonne: $colonne")
+                    coordinatesList.add(Point(colonne, ligne))
                 }
             } else {
                 println("Le produit '${item.label}' n'a pas été trouvé.")
             }
-            coordinatesList[item.id.toInt()] = coordinates
         }
-
     }
 
-    private fun getCoordinatesByLabel(json: String, label: String): List<JSONObject> {
-        val jsonArray = JSONArray(json)
+
+
+    private fun getCoordinatesByLabel(cartographyArray: JSONArray, label: String): List<JSONObject> {
         val coordinates = mutableListOf<JSONObject>()
 
-        for (i in 0 until jsonArray.length()) {
-            val jsonObject = jsonArray.getJSONObject(i)
+        for (i in 0 until cartographyArray.length()) {
+            val jsonObject = cartographyArray.getJSONObject(i)
             val nomProduit = jsonObject.getString("nom_produit")
-            if (nomProduit.equals(label, ignoreCase = true)) {
+            if (nomProduit == label)  {
                 coordinates.add(jsonObject)
             }
         }
 
         return coordinates
     }
-}
 
+    private fun logItems() {
+        for (item in itemList) {
+            Log.d("ListItem", "ID: ${item.id}, Label: ${item.label}, URL: ${item.url}, Checked: ${item.checked}")
+        }
+    }
+
+}
 data class ListItem(val id: String, val label: String, val url: String?, val checked: String)

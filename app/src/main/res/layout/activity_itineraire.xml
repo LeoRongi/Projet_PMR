@@ -50,7 +50,7 @@
             android:id="@+id/voiceButton"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:src="@drawable/ic_mic"
+
             tools:ignore="ContentDescription,TouchTargetSizeCheck,ImageContrastCheck,SpeakableTextPresentCheck" />
 
     </LinearLayout>

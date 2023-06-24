@@ -94,9 +94,13 @@ val endPoint = Point(7, colonne-1)
 
 class Itineraire : AppCompatActivity() {
 
+    private lateinit var coordinatesList: MutableList<Point>
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_itineraire)
+
+        coordinatesList = intent.getSerializableExtra("coordinatesList") as? MutableList<Point> ?: mutableListOf()
+        logCoordinatesList()
 
         lateinit var activityResultLauncher: ActivityResultLauncher<Intent>
 
@@ -193,7 +197,11 @@ class Itineraire : AppCompatActivity() {
         }
     }
 
-
+    private fun logCoordinatesList() {
+        for (point in coordinatesList) {
+            Log.d("Coordinates", "X: ${point.x}, Y: ${point.y}")
+        }
+    }
     private fun generateRandomPoints(count: Int, map: Array<IntArray>): List<Point> {
         val random = Random()
         val points = ArrayList<Point>()
@@ -615,4 +623,5 @@ class MapPanel(context: Context, attrs: AttributeSet?) : View(context, attrs) {
             }
         }
     }
+
 }

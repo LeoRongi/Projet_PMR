@@ -26,11 +26,10 @@ class MapActivity : AppCompatActivity() {
         affMap(mapMatrix)
 
         gridView = findViewById(R.id.gridView)
-        matrixAdapter = MatrixAdapter(this)
+        matrixAdapter = MatrixAdapter(this, mapMatrix.size, mapMatrix[0].size)
         gridView.adapter = matrixAdapter
         matrixAdapter.setMapMatrix(mapMatrix)
         matrixAdapter.notifyDataSetChanged()
-
     }
 
     fun affMap(mapMatrix: Array<IntArray>) {
@@ -57,7 +56,7 @@ class MapActivity : AppCompatActivity() {
         println(sb.toString())
     }
 
-    class MatrixAdapter(private val context: Context) : BaseAdapter() {
+    class MatrixAdapter(private val context: Context, private val numRows: Int, private val numCols: Int) : BaseAdapter() {
         private var mapMatrix: Array<IntArray> = arrayOf()
 
         fun setMapMatrix(mapMatrix: Array<IntArray>) {
@@ -65,19 +64,19 @@ class MapActivity : AppCompatActivity() {
         }
 
         override fun getCount(): Int {
-            return if (mapMatrix.isNotEmpty()) {
-                mapMatrix.size * mapMatrix[0].size
+            return numRows * numCols
+        }
+
+        override fun getItem(position: Int): Any? {
+            val row = position / numCols
+            val col = position % numCols
+
+            return if (row in mapMatrix.indices && col in mapMatrix[row].indices) {
+                mapMatrix[row][col]
             } else {
-                0
+                null
             }
         }
-
-        override fun getItem(position: Int): Any {
-            val row = position / mapMatrix[0].size
-            val col = position % mapMatrix[0].size
-            return mapMatrix[row][col]
-        }
-
         override fun getItemId(position: Int): Long {
             return position.toLong()
         }
@@ -100,9 +99,9 @@ class MapActivity : AppCompatActivity() {
 
 
             if (value == 1) {
-                cellView.setBackgroundColor(Color.BLACK)
-            } else {
                 cellView.setBackgroundColor(Color.WHITE)
+            } else {
+                cellView.setBackgroundColor(Color.BLACK)
             }
 
             return cellView

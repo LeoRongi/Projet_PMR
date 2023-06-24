@@ -1,122 +1,165 @@
 [
   {
-    "ligne": 0,
+    "ligne": 2,
     "colonne": 1,
     "nom_produit": "Pommes"
   },
   {
-    "ligne": 0,
+    "ligne": 2,
     "colonne": 2,
     "nom_produit": "Oranges"
   },
   {
-    "ligne": 0,
+    "ligne": 2,
     "colonne": 4,
     "nom_produit": "Bananes"
   },
   {
-    "ligne": 0,
+    "ligne": 2,
     "colonne": 5,
     "nom_produit": "Carottes"
   },
   {
-    "ligne": 0,
-    "colonne": 7,
+    "ligne": 3,
+    "colonne": 1,
     "nom_produit": "Tomates"
   },
   {
-    "ligne": 0,
-    "colonne": 8,
+    "ligne": 3,
+    "colonne": 2,
     "nom_produit": "Poivrons"
   },
   {
-    "ligne": 1,
-    "colonne": 1,
+    "ligne": 3,
+    "colonne": 4,
     "nom_produit": "Oignons"
   },
   {
-    "ligne": 1,
-    "colonne": 2,
+    "ligne": 3,
+    "colonne": 5,
     "nom_produit": "Ail"
   },
   {
-    "ligne": 1,
-    "colonne": 4,
+    "ligne": 5,
+    "colonne": 1,
     "nom_produit": "Citrons"
   },
   {
-    "ligne": 1,
-    "colonne": 5,
+    "ligne": 5,
+    "colonne": 2,
     "nom_produit": "Pommes de terre"
   },
   {
-    "ligne": 1,
-    "colonne": 7,
+    "ligne": 5,
+    "colonne": 4,
     "nom_produit": "Laitue"
   },
   {
-    "ligne": 1,
-    "colonne": 8,
+    "ligne": 5,
+    "colonne": 5,
     "nom_produit": "Brocolis"
   },
   {
-    "ligne": 2,
+    "ligne": 6,
     "colonne": 1,
     "nom_produit": "Courgettes"
   },
   {
-    "ligne": 2,
+    "ligne": 6,
     "colonne": 2,
     "nom_produit": "Champignons"
   },
   {
-    "ligne": 2,
+    "ligne": 6,
     "colonne": 4,
-    "nom_produit": "Pois"
+    "nom_produit": "Pêches"
   },
   {
-    "ligne": 2,
+    "ligne": 6,
     "colonne": 5,
     "nom_produit": "Haricots verts"
   },
   {
-    "ligne": 2,
-    "colonne": 7,
-    "nom_produit": "Pêches"
-  },
-  {
-    "ligne": 2,
-    "colonne": 8,
-    "nom_produit": "Poires"
-  },
-  {
-    "ligne": 3,
+    "ligne": 8,
     "colonne": 1,
-    "nom_produit": "Fraises"
+    "nom_produit": "Boeuf"
   },
   {
-    "ligne": 3,
+    "ligne": 8,
     "colonne": 2,
-    "nom_produit": "Raisins"
+    "nom_produit": "Poulet"
   },
   {
-    "ligne": 3,
+    "ligne": 8,
     "colonne": 4,
-    "nom_produit": "Ananas"
+    "nom_produit": "Canard"
   },
   {
-    "ligne": 3,
+    "ligne": 8,
     "colonne": 5,
-    "nom_produit": "Melons"
+    "nom_produit": "Porc"
   },
   {
-    "ligne": 3,
-    "colonne": 7,
-    "nom_produit": "Mangues"
+    "ligne": 9,
+    "colonne": 1,
+    "nom_produit": "Lapin"
   },
   {
-    "ligne": 3,
-    "colonne": 8,
-    "nom_produit": "Kiwi"
+    "ligne": 9,
+    "colonne": 2,
+    "nom_produit": "Charcuterie"
+  },
+  {
+    "ligne": 9,
+    "colonne": 4,
+    "nom_produit": "Fromages"
+  },
+  {
+    "ligne": 9,
+    "colonne": 5,
+    "nom_produit": "Yaourts"
+  },
+  {
+    "ligne": 11,
+    "colonne": 1,
+    "nom_produit": "Lait"
+  },
+  {
+    "ligne": 11,
+    "colonne": 2,
+    "nom_produit": "Oeufs"
+  },
+  {
+    "ligne": 11,
+    "colonne": 4,
+    "nom_produit": "Crème fraiche"
+  },
+  {
+    "ligne": 11,
+    "colonne": 5,
+    "nom_produit": "Farine"
+  },
+  {
+    "ligne": 12,
+    "colonne": 1,
+    "nom_produit": "Riz"
+  },
+  {
+    "ligne": 12,
+    "colonne": 2,
+    "nom_produit": "Pates"
+  },
+  {
+    "ligne": 12,
+    "colonne": 4,
+    "nom_produit": "Lentilles"
+  },
+  {
+    "ligne": 12,
+    "colonne": 5,
+    "nom_produit": "Semoule"
   }
+
+
+
 ]
