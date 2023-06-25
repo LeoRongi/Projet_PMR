@@ -1,7 +1,7 @@
 package com.example.projet_pmr
 
-import android.content.Intent
 import android.content.Context
+import android.content.Intent
 import android.content.SharedPreferences
 import android.graphics.Point
 import android.os.Bundle
@@ -24,14 +24,9 @@ import com.android.volley.Response
 import com.android.volley.toolbox.JsonObjectRequest
 import com.android.volley.toolbox.Volley
 import com.google.gson.Gson
-import com.google.gson.reflect.TypeToken
-
 import org.json.JSONArray
 import org.json.JSONException
 import org.json.JSONObject
-import java.io.IOException
-import java.io.InputStream
-import java.nio.charset.Charset
 
 
 class ShowListActivity : AppCompatActivity() {
@@ -40,6 +35,7 @@ class ShowListActivity : AppCompatActivity() {
     private lateinit var itemList: MutableList<ListItem>
     private lateinit var itemAdapter: ItemListAdapter
     private lateinit var coordinatesList: MutableList<Point>
+    private lateinit var articleNamesList :MutableList<String>
 
     private lateinit var recyclerView: RecyclerView
     private lateinit var addItemButton: Button
@@ -85,9 +81,11 @@ class ShowListActivity : AppCompatActivity() {
 
 
         startButton.setOnClickListener {
-            coordinatesList = mutableListOf()
+            coordinatesList = ArrayList<Point>()
+            articleNamesList = ArrayList<String>()
             getCoordinates()
             val intent = Intent(applicationContext, Itineraire::class.java)
+            intent.putStringArrayListExtra("articleNamesList", ArrayList(articleNamesList))
             intent.putExtra("coordinatesList", ArrayList(coordinatesList))
             startActivity(intent)
         }
@@ -337,8 +335,10 @@ class ShowListActivity : AppCompatActivity() {
         System.out.println(cartographyArray)
         logItems()
         for (item in itemList) {
+
             val coordinates = getCoordinatesByLabel(cartographyArray, item.label)
             if (coordinates.isNotEmpty()) {
+                articleNamesList.add(item.label)
                 println("Les coordonnées du produit '${item.label}' sont :")
                 for (coordinate in coordinates) {
                     val ligne = coordinate.getInt("ligne")

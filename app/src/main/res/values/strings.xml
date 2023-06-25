@@ -46,5 +46,8 @@
     <string name="generate">\n</string>
     <string name="draw" />
     <string name="nombre_d_articles" />
-    <string name="_1" />
+    <string name="calculer">Calculer</string>
+    <string name="nb">Nb</string>
+    <string name="tape_npr_c_dente">Étape \nprécédente</string>
+    <string name="tape_nsuivante">Étape \nsuivante</string>
 </resources>

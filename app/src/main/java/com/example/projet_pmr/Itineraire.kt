@@ -14,6 +14,7 @@ import android.view.View
 import android.widget.Button
 import android.widget.EditText
 import android.widget.ImageButton
+import android.widget.TextView
 import android.widget.Toast
 import androidx.activity.result.ActivityResult
 import androidx.activity.result.ActivityResultLauncher
@@ -21,6 +22,7 @@ import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.ContextCompat
 import java.util.*
+import kotlin.collections.ArrayList
 
 val map = arrayOf(
     intArrayOf(0, 0, 0, 0, 0, 0, 0, 0),
@@ -92,17 +94,20 @@ val colonne = map[0].size
 val startPoint = Point(ligne - 1, colonne - 1)
 val endPoint = Point(7, colonne-1)
 
+@Suppress("DEPRECATION")
 class Itineraire : AppCompatActivity() {
 
     private lateinit var coordinatesList: MutableList<Point>
+    private lateinit var invertedCoordinatesList : MutableList<Point>
+    private val relationTable = mutableMapOf<Point, String>()
+
+    @SuppressLint("SetTextI18n")
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_itineraire)
 
-        coordinatesList = intent.getSerializableExtra("coordinatesList") as? MutableList<Point> ?: mutableListOf()
-        logCoordinatesList()
-
         lateinit var activityResultLauncher: ActivityResultLauncher<Intent>
+
 
         val mapPanel: MapPanel = findViewById(R.id.mapPanel)
         val generateButton: Button = findViewById(R.id.generateButton)
@@ -110,7 +115,43 @@ class Itineraire : AppCompatActivity() {
         val previousStep: Button = findViewById(R.id.previousStep)
         val editText: EditText = findViewById(R.id.nbArticle)
         val voiceButton: ImageButton = findViewById(R.id.voiceButton)
+        val nextArticle : TextView = findViewById(R.id.nextArticle)
+        val qrCodeButton: ImageButton = findViewById(R.id.qrCodeButton)
 
+
+        coordinatesList = intent.getSerializableExtra("coordinatesList") as? MutableList<Point> ?: mutableListOf()
+        val articleNamesList = intent.getStringArrayListExtra("articleNamesList")
+
+        editText.visibility = View.GONE
+        if (coordinatesList.size == 0) {
+            editText.visibility = View.VISIBLE
+            Toast.makeText(this, "La liste est vide. Vous pouvez générer des itinéraires", Toast.LENGTH_SHORT).show()
+        }
+        else {
+            invertedCoordinatesList = inverseCoordinates(coordinatesList).toMutableList()
+            Log.i("articleNamesList", articleNamesList.toString())
+            logCoordinates(invertedCoordinatesList)
+
+            //Création d'une relation entre les coordonnées de chaque point et le nom de l'article
+
+            if (invertedCoordinatesList.size == articleNamesList!!.size) {
+                for (i in invertedCoordinatesList.indices) {
+                    val point = invertedCoordinatesList[i]
+                    val articleName = articleNamesList[i]
+                    relationTable[point] = articleName
+                }
+            }
+        }
+
+
+
+        //Listener du bouton de scan QRcode
+        qrCodeButton.setOnClickListener{
+
+        }
+
+
+        //Listener du bouton de commande vocale
         voiceButton.setOnClickListener{
             val intent = Intent(RecognizerIntent.ACTION_RECOGNIZE_SPEECH)
             intent.putExtra(RecognizerIntent.EXTRA_LANGUAGE_MODEL,RecognizerIntent.LANGUAGE_MODEL_FREE_FORM)
@@ -123,13 +164,33 @@ class Itineraire : AppCompatActivity() {
                 Toast.makeText(applicationContext,"Device not supported", Toast.LENGTH_SHORT).show()
             }
         }
+        //Paramétrage de la récupération des données Speech to Text
         activityResultLauncher = registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result: ActivityResult? ->
             if (result?.resultCode == Activity.RESULT_OK && result.data != null) {
                 val speechText = result.data?.getStringArrayListExtra(RecognizerIntent.EXTRA_RESULTS) as ArrayList<String>
                 val words = speechText[0].split(" ")
                 Log.i("speechText", words.toString())
+
+                //Actions suivant le mot prononcé
                 when (words[0]) {
                     "générer" -> {
+                        if (coordinatesList.size == 0) {
+                            if (words.size > 1) {
+                                if (words[1].toIntOrNull() != null) {
+                                    Log.i("words[1]",words[1])
+                                    editText.setText(words[1])
+                                }
+                                else Toast.makeText(
+                                    applicationContext,
+                                    "Le mot qui suit générer doit être un entier",
+                                    Toast.LENGTH_SHORT
+                                ).show()
+                            }
+                        }
+                            generateButton.performClick()
+                    }
+
+                    "calculer"-> {
                         generateButton.performClick()
                     }
                     "suivant" -> {
@@ -154,24 +215,30 @@ class Itineraire : AppCompatActivity() {
         }
 
 
-
+        //On dessine la carte
         mapPanel.setMap(map)
         val pointsToHide = mutableListOf<Point>()
+
+        //Listener du bouton calcul d'itinéraire
         generateButton.setOnClickListener {
             Log.i("Nouvelle génération", "_____________________________________________________________________")
+
+            //Si la liste de course est vide, on passe en mode génération aléatoire d'articles en utilisant l'EditText
+            if (coordinatesList.size == 0) { invertedCoordinatesList = generateRandomPoints(editText.text.toString().toInt(), map).toMutableList()}
+
+            //Définition des variables utiles à la gestion de l'itinéraire
             var currentStep = 0
-            pointsToHide.clear()
-
-
-            val randomPoints = generateRandomPoints(editText.text.toString().toInt(), map)
-
-
-            val checkPoints = checkpoints(randomPoints)
+            val checkPoints = checkpoints(invertedCoordinatesList)
             val (optimalOrder, optimalPath) = sortCheckpoints(checkPoints)
             var currentPath = optimalPath[currentStep]
+            var currentArticle = getAdjacentArticle(optimalOrder[1])
+            pointsToHide.clear()
 
-            mapPanel.setPoints(randomPoints, checkPoints, optimalOrder, currentPath)
+            //On dessine les points d'intérêt et le premier chemin à parcourir, on affiche le prochain article à ramasser
+            mapPanel.setPoints(invertedCoordinatesList, checkPoints, optimalOrder, currentPath)
+            nextArticle.text = "Prochain article: $currentArticle"
 
+            //Listener du bouton d'étape suivante
             nextStep.setOnClickListener {
                 if (currentStep +1 > optimalPath.size-1) {
                     Toast.makeText(this, "Fin du trajet", Toast.LENGTH_SHORT).show()
@@ -179,29 +246,61 @@ class Itineraire : AppCompatActivity() {
                     pointsToHide.add(currentPath[0])
                     currentStep += 1
                     currentPath = optimalPath[currentStep]
+                    currentArticle = getAdjacentArticle(optimalOrder[currentStep+1])
                     mapPanel.setPath(currentPath)
                     mapPanel.setHiddenCheckpoints(pointsToHide)
+                    nextArticle.text = "Prochain article: $currentArticle"
                 }
             }
+            //Listener du bouton d'étape précédente
             previousStep.setOnClickListener {
                 if (currentStep -1 < 0) {
                     Toast.makeText(this, "Début du trajet", Toast.LENGTH_SHORT).show()
                 } else {
                     currentStep -= 1
                     currentPath = optimalPath[currentStep]
+                    currentArticle = getAdjacentArticle(optimalOrder[currentStep+1])
                     pointsToHide.removeAt(pointsToHide.size-1)
-                    mapPanel.setPoints(randomPoints, checkPoints, optimalOrder, currentPath)
+                    mapPanel.setPoints(invertedCoordinatesList, checkPoints, optimalOrder, currentPath)
                     mapPanel.setHiddenCheckpoints(pointsToHide)
+                    nextArticle.text = "Prochain article: $currentArticle"
                 }
             }
         }
+
+
+        }
+
+    //Fonction pour obtenir les articles adjacents à une case chemin du magasin
+    fun getAdjacentArticle(point: Point) : List<String> {
+        val adjacentArticle = mutableListOf<String>()
+        Log.i("point", point.toString())
+        val dessus = Point(point.x-1,point.y)
+        val dessous = Point(point.x+1,point.y)
+        if (relationTable[dessus] != null) adjacentArticle.add(relationTable[dessus]!!)
+        Log.i("dessus", relationTable[dessus].toString())
+        if (relationTable[dessous] != null) adjacentArticle.add(relationTable[dessous]!!)
+        Log.i("dessous", relationTable[dessous].toString())
+        return adjacentArticle
     }
 
-    private fun logCoordinatesList() {
-        for (point in coordinatesList) {
+    //Fonction pour intervertir les coordonnées x et y d'une liste de points
+    fun inverseCoordinates(points: List<Point>): List<Point> {
+        val invertedPoints = mutableListOf<Point>()
+        for (point in points) {
+            val invertedPoint = Point(point.y, point.x)
+            invertedPoints.add(invertedPoint)
+        }
+        return invertedPoints
+    }
+
+    //Fonction pour afficher les coordonnées d'une liste de point dans logcat
+    private fun logCoordinates(coordList : List<Point>) {
+        for (point in coordList) {
             Log.d("Coordinates", "X: ${point.x}, Y: ${point.y}")
         }
     }
+    //Fonction pour générer un nombre count d'articles aléatoires dans le magasin
     private fun generateRandomPoints(count: Int, map: Array<IntArray>): List<Point> {
         val random = Random()
         val points = ArrayList<Point>()
@@ -226,6 +325,7 @@ class Itineraire : AppCompatActivity() {
         return points
     }
 
+    //Fonction pour déterminer les cases chemin adjacentes à des articles situés sur les cases de la liste points
     private fun checkpoints(points: List<Point>): List<Point> {
         val adjustedPoints = mutableListOf<Point>()
 
@@ -243,6 +343,9 @@ class Itineraire : AppCompatActivity() {
         return adjustedPoints.distinct()
     }
 
+    //Fonction pour déterminer le plus court chemin passant par tous les points
+    // de la liste checkpoints en partant de la case startPoint et finissant par endPoint
+
     private fun sortCheckpoints(checkpoints: List<Point>): Pair<List<Point>, List<List<Point>>> {
 
         val sortedCheckpoints = checkpoints.sortedBy{-it.x}.sortedBy { zigzag.indexOf(it) }
@@ -256,7 +359,6 @@ class Itineraire : AppCompatActivity() {
 
         generatePermutations(sortedCheckpoints.toMutableList(), checkpoints.size, permutations)
         Log.i("Permutation size", permutations.size.toString())
-        Log.i("Unique permutations size", permutations.distinct().size.toString())
 
         for (permutation in permutations) {
             val (distance, path) = calculateTotalDistance(startPoint, endPoint, permutation)
@@ -278,6 +380,9 @@ class Itineraire : AppCompatActivity() {
         return Pair(optimalOrder, optimalPath)
     }
 
+    //Fonction pour faire les permutations des points de la liste points,
+    // permet d'essayer des combinaisons de points différentes
+    // basé sur l'algorithme de Heap
     private fun generatePermutations(points: MutableList<Point>, size: Int, permutations: MutableList<List<Point>>) {
         if (size == 1 ) {
             permutations.add(points.toList())
@@ -285,26 +390,26 @@ class Itineraire : AppCompatActivity() {
         }
 
         for (i in 0 until size) {
-            generatePermutations(points, size - 1, permutations)
             if (size % 2 == 1) {
                 swap(points, 0, size - 1)
             } else {
                 swap(points, i, size - 1)
             }
+            generatePermutations(points, size - 1, permutations)
             if (permutations.size >= 30000) // Ajout de la vérification du nombre de permutations après chaque itération
                 return
 
         }
     }
 
-
+    //Fonction pour inverser 2 points d'une liste selon leurs indexes
     private fun swap(points: MutableList<Point>, i: Int, j: Int) {
         val temp = points[i]
         points[i] = points[j]
         points[j] = temp
     }
 
-
+    //Fonction pour calculer la longueur totale d'un itinéraire
     private fun calculateTotalDistance(startPoint: Point, endPoint: Point, points: List<Point>): Pair<Float, List<List<Point>>> {
         var totalDistance = 0f
         val startToEnd = points.toMutableList()
@@ -324,7 +429,8 @@ class Itineraire : AppCompatActivity() {
 
 
 
-
+    //Fonction pour calculer la distance la plus courte d'un pour p1 à un point p2
+    // utilise l'algorithme de parcourt en largeur BFS
     private fun calculateDistance(matrix: Array<IntArray>, p1: Point, p2: Point): Pair<Int, List<Point>> {
         val startX = p1.x
         val startY = p1.y
@@ -428,7 +534,7 @@ class Itineraire : AppCompatActivity() {
 
 }
 
-
+//Classe graphique de notre application
 class MapPanel(context: Context, attrs: AttributeSet?) : View(context, attrs) {
     private val squareSize = 100
     private val wallColor = Color.BLACK
@@ -474,6 +580,7 @@ class MapPanel(context: Context, attrs: AttributeSet?) : View(context, attrs) {
     override fun onDraw(canvas: Canvas) {
         super.onDraw(canvas)
 
+        //On dessine la carte vierge suivant la matrice map
 
         map?.let {
             val paint = Paint()
@@ -496,6 +603,7 @@ class MapPanel(context: Context, attrs: AttributeSet?) : View(context, attrs) {
             }
         }
 
+        //On dessine les points d'articles en rouge
         randomPoints?.let {
             val randomPointPaint = Paint()
             randomPointPaint.color = red
@@ -511,7 +619,7 @@ class MapPanel(context: Context, attrs: AttributeSet?) : View(context, attrs) {
             }
         }
 
-
+//On dessine les points de passage pour ramasser les articles en vert, avec ordre de passage inscrit
         orderedCheckpoints?.let {
             val checkpointPaint = Paint()
             checkpointPaint.color = blue
@@ -537,6 +645,7 @@ class MapPanel(context: Context, attrs: AttributeSet?) : View(context, attrs) {
             }
         }
 
+        //On efface les points un fois atteints
         hiddenCheckpoints?.let{
             val hiddePointPaint = Paint()
             val hiddeArticlePaint = Paint()
@@ -550,7 +659,7 @@ class MapPanel(context: Context, attrs: AttributeSet?) : View(context, attrs) {
                     (point.x + 1) * squareSize.toFloat(),
                     hiddePointPaint
                 )
-                if (0 < point.x && 0 < point.y && point.x < ligne - 1 && point.y < colonne ) {
+                if (0 < point.x &&  point.x < ligne - 1 && point.y < colonne ) {
                     if (map!![point.x + 1][point.y] == 0) {
                         canvas.drawRect(
                             point.y * squareSize.toFloat() + 2,
@@ -573,6 +682,7 @@ class MapPanel(context: Context, attrs: AttributeSet?) : View(context, attrs) {
             }
         }
 
+        //On dessine le chemin passant par les points de currentPath
         currentPath?.let { path ->
             val pathPaint = Paint()
             val startendPaint = Paint()

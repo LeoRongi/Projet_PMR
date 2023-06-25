@@ -14,7 +14,7 @@
         android:id="@+id/mapPanel"
         android:layout_width="wrap_content"
         android:layout_height="570dp"
-        android:layout_marginLeft="37dp"
+        android:layout_marginStart="37dp"
         android:backgroundTint="@color/grey"
         android:background="@color/grey"/>
 
@@ -28,7 +28,7 @@
             android:id="@+id/generateButton"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Calculer"
+            android:text="@string/calculer"
             android:textSize="14sp"
             android:backgroundTint="@color/red"
             android:layout_marginEnd="20dp" />
@@ -37,9 +37,9 @@
             android:id="@+id/nbArticle"
             android:layout_width="50dp"
             android:layout_height="wrap_content"
-            android:hint="Nb"
+            android:hint="@string/nb"
             android:minHeight="48dp"
-            android:text="@string/_1"
+            android:text="1"
             android:autofillHints="1"
             android:inputType="number"
             android:textSize="20sp"
@@ -50,7 +50,14 @@
             android:id="@+id/voiceButton"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:src="@drawable/ic_mic"
+            tools:ignore="ContentDescription,TouchTargetSizeCheck,ImageContrastCheck,SpeakableTextPresentCheck" />
 
+        <ImageButton
+            android:id="@+id/qrCodeButton"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:src="@drawable/qrcode"
             tools:ignore="ContentDescription,TouchTargetSizeCheck,ImageContrastCheck,SpeakableTextPresentCheck" />
 
     </LinearLayout>
@@ -66,20 +73,32 @@
             android:id="@+id/previousStep"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Étape \nprécédente"
+            android:text="@string/tape_npr_c_dente"
             android:textSize="14sp"
             android:backgroundTint="@color/blue"
             android:layout_marginEnd="30dp"
-            tools:ignore="TouchTargetSizeCheck,VisualLintBounds" />
+            tools:ignore="TouchTargetSizeCheck,VisualLintBounds"
+            style="?android:attr/buttonBarButtonStyle" />
         <Button
             android:id="@+id/nextStep"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Étape \nsuivante"
+            android:text="@string/tape_nsuivante"
             android:backgroundTint="@color/blue"
             android:textSize="14sp"
-            tools:ignore="TouchTargetSizeCheck,VisualLintBounds" />
+            tools:ignore="TouchTargetSizeCheck,VisualLintBounds"
+            style="?android:attr/buttonBarButtonStyle" />
 
     </LinearLayout>
+    <TextView
+        android:id="@+id/nextArticle"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Lancez le calcul"
+        android:textSize="20sp"
+        android:layout_alignParentBottom="true"
+        android:gravity="center"
+        android:textColor="@color/yellow"/>
+
 
 </LinearLayout>
