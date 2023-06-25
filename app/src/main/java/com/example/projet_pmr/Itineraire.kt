@@ -145,18 +145,13 @@ class Itineraire : AppCompatActivity() {
 
 
 
-        //Listener du bouton de scan QRcode
-        qrCodeButton.setOnClickListener{
-
-        }
-
 
         //Listener du bouton de commande vocale
         voiceButton.setOnClickListener{
             val intent = Intent(RecognizerIntent.ACTION_RECOGNIZE_SPEECH)
             intent.putExtra(RecognizerIntent.EXTRA_LANGUAGE_MODEL,RecognizerIntent.LANGUAGE_MODEL_FREE_FORM)
             intent.putExtra(RecognizerIntent.EXTRA_LANGUAGE,Locale.getDefault())
-            intent.putExtra(RecognizerIntent.EXTRA_PROMPT,"Say something...")
+            intent.putExtra(RecognizerIntent.EXTRA_PROMPT,"Dites calculer, suivant ou précédent pour naviguer dans l'itinéraire")
             try {
                 activityResultLauncher.launch(intent)
             }catch (exp:ActivityNotFoundException)
@@ -238,6 +233,8 @@ class Itineraire : AppCompatActivity() {
             mapPanel.setPoints(invertedCoordinatesList, checkPoints, optimalOrder, currentPath)
             nextArticle.text = "Prochain article: $currentArticle"
 
+
+
             //Listener du bouton d'étape suivante
             nextStep.setOnClickListener {
                 if (currentStep +1 > optimalPath.size-1) {
@@ -265,6 +262,12 @@ class Itineraire : AppCompatActivity() {
                     mapPanel.setHiddenCheckpoints(pointsToHide)
                     nextArticle.text = "Prochain article: $currentArticle"
                 }
+            }
+
+            //Listener du bouton de scan QRcode
+            qrCodeButton.setOnClickListener{
+
+
             }
         }
 
