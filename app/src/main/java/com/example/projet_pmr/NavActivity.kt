@@ -28,6 +28,7 @@ import io.github.sceneview.ar.arcore.LightEstimationMode
 import io.github.sceneview.ar.node.ArModelNode
 import io.github.sceneview.ar.node.PlacementMode
 import io.github.sceneview.math.Position
+import io.github.sceneview.math.Rotation
 import java.util.concurrent.ExecutorService
 import java.util.concurrent.Executors
 
@@ -154,30 +155,34 @@ class NavActivity : AppCompatActivity() {
 
     private fun placeModel(barcode: String) {
         // Charger et placer l'objet uniquement lorsqu'on appuie sur le bouton
-        val fileLocation: String
+        val selectedRotation: Float
         val intent = intent
         val navigation = intent.getSerializableExtra("currentPath") as? MutableList<Point> ?: mutableListOf() //Récupération de l'itinéraire
         val posIndex: Int = navigation.indexOf(barcode as Point)
         val nextPos: Point = navigation.get(posIndex!! + 1) //Position à venir
 
-        if (barcode.x < nextPos.x) { //Si la prochaine position est en dessous
-            fileLocation = "models/down_arrow.glb"
-        } else if (barcode.x > nextPos.x) { //Si la prochaine position est au dessus
-            fileLocation = "models/up_arrow.glb"
+        if (barcode.x < nextPos.x) { //Si la prochaine position est derrière
+            selectedRotation = 270f
+        } else if (barcode.x > nextPos.x) { //Si la prochaine position est devant
+            selectedRotation = 90f
         } else if (barcode.y < nextPos.y) { //Si la prochaine position est à gauche
-            fileLocation = "models/left_arrow.glb"
+            selectedRotation = 180f
         } else { //Si la prochaine position est à droite
-            fileLocation = "models/right_arrow.glb"
+            selectedRotation = 0f
         }
         modelNode = ArModelNode(PlacementMode.INSTANT).apply {
             loadModelGlbAsync(
-                glbFileLocation = fileLocation,
+                glbFileLocation = "models/direction_arrow.glb",
                 scaleToUnits = 1f,
                 centerOrigin = Position(-0.5f),
             ) {
                 sceneView.planeRenderer.isVisible = true
             }
         }
+        //Rotation de la flèche
+        val rotation = Rotation(y = selectedRotation)
+        modelNode.worldRotation = rotation
+
         sceneView.addChild(modelNode)
         scene = true
     }
