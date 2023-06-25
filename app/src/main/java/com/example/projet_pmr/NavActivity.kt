@@ -63,9 +63,6 @@ class NavActivity : AppCompatActivity() {
 
         scanButton = findViewById<Button>(R.id.scanButton)
         scanButton.setOnClickListener {
-            if (scene == true){
-                sceneView.removeChild(modelNode)
-            }
             if (allPermissionsGranted()) {
                 startCameraWithDelay()
             } else {
@@ -96,8 +93,7 @@ class NavActivity : AppCompatActivity() {
         if (isCameraRunning) return
 
         val intent = intent
-        val navigation = intent.getStringExtra("navigation")
-
+        val navigation = intent.getSerializableExtra("currentPath") as? MutableList<Point> ?: mutableListOf() //Récupération de l'itinéraire
 
         val cameraProviderFuture = ProcessCameraProvider.getInstance(this)
         cameraProviderFuture.addListener({
@@ -112,9 +108,12 @@ class NavActivity : AppCompatActivity() {
                 Log.d(TAG, "Scanned QR Code: $barcode")
                 runOnUiThread {
                     Toast.makeText(this, "Scanned QR Code: $barcode", Toast.LENGTH_SHORT).show()
+                    val x = barcode[0]
+                    val y = barcode[1]
+                    val currentPoint = Point(x.toInt(), y.toInt())
                     if (navigation != null) {
-                        if (navigation.contains(barcode)) {
-                            placeModel(barcode)
+                        if (currentPoint in navigation) {
+                            placeModel(currentPoint)
                         } else {
                             val intent = Intent(this, MapActivity::class.java)
                             intent.putExtra("currentPosition", barcode)
@@ -153,19 +152,22 @@ class NavActivity : AppCompatActivity() {
         }, startDelay) // Délai initial de 2 secondes
     }
 
-    private fun placeModel(barcode: String) {
+    private fun placeModel(currentPoint: Point) {
+        if (scene == true){
+            sceneView.removeChild(modelNode) //Suppression du modèle chargé si il y en a un
+        }
         // Charger et placer l'objet uniquement lorsqu'on appuie sur le bouton
         val selectedRotation: Float
         val intent = intent
         val navigation = intent.getSerializableExtra("currentPath") as? MutableList<Point> ?: mutableListOf() //Récupération de l'itinéraire
-        val posIndex: Int = navigation.indexOf(barcode as Point)
+        val posIndex: Int = navigation.indexOf(currentPoint)
         val nextPos: Point = navigation.get(posIndex!! + 1) //Position à venir
 
-        if (barcode.x < nextPos.x) { //Si la prochaine position est derrière
+        if (currentPoint.x < nextPos.x) { //Si la prochaine position est derrière
             selectedRotation = 270f
-        } else if (barcode.x > nextPos.x) { //Si la prochaine position est devant
+        } else if (currentPoint.x > nextPos.x) { //Si la prochaine position est devant
             selectedRotation = 90f
-        } else if (barcode.y < nextPos.y) { //Si la prochaine position est à gauche
+        } else if (currentPoint.y < nextPos.y) { //Si la prochaine position est à gauche
             selectedRotation = 180f
         } else { //Si la prochaine position est à droite
             selectedRotation = 0f
