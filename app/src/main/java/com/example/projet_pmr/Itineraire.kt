@@ -101,7 +101,7 @@ class Itineraire : AppCompatActivity() {
     private lateinit var invertedCoordinatesList : MutableList<Point>
     private val relationTable = mutableMapOf<Point, String>()
 
-    @SuppressLint("SetTextI18n")
+    @SuppressLint("SetTextI18n", "UnsafeOptInUsageError")
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_itineraire)
@@ -121,6 +121,12 @@ class Itineraire : AppCompatActivity() {
 
         coordinatesList = intent.getSerializableExtra("coordinatesList") as? MutableList<Point> ?: mutableListOf()
         val articleNamesList = intent.getStringArrayListExtra("articleNamesList")
+        val barcode = intent.getStringExtra("barcode")
+        if (barcode != null) {
+            Log.i("barcode", barcode)
+        }
+        else Log.i("barcode", "Null")
+
 
         editText.visibility = View.GONE
         if (coordinatesList.size == 0) {
@@ -266,13 +272,15 @@ class Itineraire : AppCompatActivity() {
 
             //Listener du bouton de scan QRcode
             qrCodeButton.setOnClickListener{
-
-
+                val intent = Intent(applicationContext, NavActivity::class.java)
+                intent.putExtra("coordinatesList", ArrayList(currentPath))
+                startActivity(intent)
             }
         }
-
-
         }
+
+
+
 
     //Fonction pour obtenir les articles adjacents à une case chemin du magasin
     fun getAdjacentArticle(point: Point) : List<String> {

@@ -32,6 +32,7 @@ import io.github.sceneview.math.Rotation
 import java.util.concurrent.ExecutorService
 import java.util.concurrent.Executors
 
+@Suppress("DEPRECATION")
 @ExperimentalGetImage
 class NavActivity : AppCompatActivity() {
 
@@ -116,7 +117,7 @@ class NavActivity : AppCompatActivity() {
                         if (navigation.contains(barcode)) {
                             placeModel(barcode)
                         } else {
-                            val intent = Intent(this, MapActivity::class.java)
+                            val intent = Intent(this, Itineraire::class.java)
                             intent.putExtra("currentPosition", barcode)
                             startActivity(intent)
                         }
