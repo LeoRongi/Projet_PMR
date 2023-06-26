@@ -73,9 +73,7 @@ class CreateAccountActivity : AppCompatActivity() {
     private fun createAccount(urlAPI: String, username: String, password: String) {
         val requestQueue = Volley.newRequestQueue(this)
 
-        val url = "$urlAPI"+"users?pseudo=$username&pass=$password"
-
-        connectAccount(urlAPI, "tom", "web")
+        val url = "$urlAPI" + "users?pseudo=$username&pass=$password"
 
         val request = object : JsonObjectRequest(
             Request.Method.POST, url, null,
@@ -83,12 +81,14 @@ class CreateAccountActivity : AppCompatActivity() {
                 try {
                     val success = response.getBoolean("success")
                     if (success) {
-                        connectAccount(urlAPI, username, password)
-                        startActivity(Intent(applicationContext, Menu::class.java))
+                        connectAccount(urlAPI, username, password) { token ->
+                            saveToken(token)
+                            startActivity(Intent(applicationContext, Menu::class.java))
+                        }
                     } else {
-                        val error = " Erreur lors de la création du compte"
-                        errorCreateAccountTextView!!.visibility = View.VISIBLE
-                        errorCreateAccountTextView!!.text = error
+                        val error = "Erreur lors de la création du compte"
+                        errorCreateAccountTextView?.visibility = View.VISIBLE
+                        errorCreateAccountTextView?.text = error
                     }
                 } catch (e: JSONException) {
                     e.printStackTrace()
@@ -106,26 +106,21 @@ class CreateAccountActivity : AppCompatActivity() {
                 return headers
             }
         }
-
-
         requestQueue.add(request)
-
     }
 
-    private fun connectAccount(urlAPI: String, user: String, password: String){
+
+    private fun connectAccount(urlAPI: String, user: String, password: String, callback: (String) -> Unit) {
         val requestQueue = Volley.newRequestQueue(this)
 
-        val url = "$urlAPI"+"authenticate?user=$user&password=$password"
+        val url = urlAPI +"authenticate?user=$user&password=$password"
 
         val request = JsonObjectRequest(Request.Method.POST, url, null,
             { response ->
-                // Handle API response here
                 val token = response.getString("hash")
-                saveToken(token)
-
+                callback(token)
             },
             { error ->
-                // Handle API request error
                 Toast.makeText(this@CreateAccountActivity, "API connection error: ${error.message}", Toast.LENGTH_LONG).show()
             })
 
