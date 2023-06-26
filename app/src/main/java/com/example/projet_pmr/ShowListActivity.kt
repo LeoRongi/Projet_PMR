@@ -5,9 +5,6 @@ import android.content.Intent
 import android.content.SharedPreferences
 import android.graphics.Point
 import android.os.Bundle
-import android.speech.RecognitionListener
-import android.speech.RecognizerIntent
-import android.speech.SpeechRecognizer
 import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
@@ -44,11 +41,9 @@ class ShowListActivity : AppCompatActivity() {
     private lateinit var sharedPreferences: SharedPreferences
     private lateinit var gson: Gson
 
-    private lateinit var speechRecognizer: SpeechRecognizer
 
-    companion object {
-        private const val SPEECH_REQUEST_CODE = 1
-    }
+
+
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -78,8 +73,6 @@ class ShowListActivity : AppCompatActivity() {
         val startButton = findViewById<Button>(R.id.startNavigation)
 
 
-
-
         startButton.setOnClickListener {
             coordinatesList = ArrayList<Point>()
             articleNamesList = ArrayList<String>()
@@ -98,78 +91,12 @@ class ShowListActivity : AppCompatActivity() {
             }
         }
 
-        speechRecognizer = SpeechRecognizer.createSpeechRecognizer(this)
-        if (!SpeechRecognizer.isRecognitionAvailable(this)) {
-            Toast.makeText(
-                this,
-                "La reconnaissance vocale n'est pas disponible sur cet appareil.",
-                Toast.LENGTH_SHORT
-            ).show()
-            return
-        }
-        speechRecognizer.setRecognitionListener(object : RecognitionListener {
-            override fun onReadyForSpeech(params: Bundle?) {
-                // Le service est prêt pour la parole
 
-            }
-
-            override fun onBeginningOfSpeech() {
-                // Le début de la parole est détecté
-            }
-
-            override fun onRmsChanged(rmsdB: Float) {
-                // Le niveau audio est en cours de changement
-            }
-
-            override fun onBufferReceived(buffer: ByteArray?) {
-                // Un tampon audio est reçu
-            }
-
-            override fun onEndOfSpeech() {
-                // La fin de la parole est détectée
-            }
-
-            override fun onError(error: Int) {
-                // Une erreur de reconnaissance vocale s'est produite
-            }
-
-            override fun onResults(results: Bundle?) {
-                // Les résultats de la reconnaissance vocale sont disponibles
-                val voiceResults = results?.getStringArrayList(SpeechRecognizer.RESULTS_RECOGNITION)
-                voiceResults?.let { handleVoiceResults(it) }
-            }
-
-            override fun onPartialResults(partialResults: Bundle?) {
-                // Des résultats partiels de la reconnaissance vocale sont disponibles
-            }
-
-            override fun onEvent(eventType: Int, params: Bundle?) {
-                // Un événement non spécifié est survenu
-            }
-        })
 
 
     }
 
-    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
-        super.onActivityResult(requestCode, resultCode, data)
 
-        if (requestCode == SPEECH_REQUEST_CODE && resultCode == RESULT_OK) {
-            val results = data?.getStringArrayListExtra(RecognizerIntent.EXTRA_RESULTS)
-            results?.let { handleVoiceResults(it) }
-        }
-    }
-
-    // Ajoutez la méthode startListening() pour démarrer la reconnaissance vocale
-    private fun startListening() {
-        val speechRecognizerIntent = Intent(RecognizerIntent.ACTION_RECOGNIZE_SPEECH)
-        speechRecognizerIntent.putExtra(
-            RecognizerIntent.EXTRA_LANGUAGE_MODEL,
-            RecognizerIntent.LANGUAGE_MODEL_FREE_FORM
-        )
-
-        startActivityForResult(speechRecognizerIntent, SPEECH_REQUEST_CODE)
-    }
 
     // Dans la méthode onActivityResult()
     private fun handleVoiceResults(results: ArrayList<String>) {
@@ -317,14 +244,6 @@ class ShowListActivity : AppCompatActivity() {
         return sharedPreferences.getString("token", "") ?: ""
     }
 
-    private fun startSpeechToText() {
-        val speechRecognizerIntent = Intent(RecognizerIntent.ACTION_RECOGNIZE_SPEECH)
-        speechRecognizerIntent.putExtra(
-            RecognizerIntent.EXTRA_LANGUAGE_MODEL,
-            RecognizerIntent.LANGUAGE_MODEL_FREE_FORM
-        )
-        startActivityForResult(speechRecognizerIntent, SPEECH_REQUEST_CODE)
-    }
 
 
     private fun getCoordinates() {

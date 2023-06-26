@@ -59,7 +59,7 @@ class Menu : AppCompatActivity() {
         // Configuration du bouton pour ajouter une nouvelle liste
         addButton = findViewById(R.id.buttonAddList)
         newListEditText = findViewById(R.id.editTextListName)
-        val MapButton = findViewById<Button>(R.id.buttonAffMap)
+
 
         addButton.setOnClickListener {
             val newListName = newListEditText.text.toString()
@@ -70,9 +70,7 @@ class Menu : AppCompatActivity() {
             }
         }
 
-        MapButton.setOnClickListener {
-            startActivity(Intent(applicationContext, MapActivity::class.java))
-        }
+
 
 
     }
