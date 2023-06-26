@@ -273,7 +273,8 @@ class Itineraire : AppCompatActivity() {
             //Listener du bouton de scan QRcode
             qrCodeButton.setOnClickListener{
                 val intent = Intent(applicationContext, NavActivity::class.java)
-                intent.putExtra("coordinatesList", ArrayList(currentPath))
+                intent.putExtra("coordinatesList", ArrayList(optimalPath))
+                intent.putExtra("currentStep",currentStep)
                 startActivity(intent)
             }
         }
