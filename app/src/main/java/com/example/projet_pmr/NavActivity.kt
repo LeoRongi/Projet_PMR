@@ -79,8 +79,6 @@ class NavActivity : AppCompatActivity() {
             .setBarcodeFormats(Barcode.FORMAT_QR_CODE)
             .build()
         barcodeScanner = BarcodeScanning.getClient(options)
-
-        // Demande la permission d'utiliser la caméra si on ne l'a pas
     }
 
     private fun allPermissionsGranted(): Boolean {
@@ -115,7 +113,7 @@ class NavActivity : AppCompatActivity() {
                         if (currentPoint in navigation) {
                             placeModel(currentPoint)
                         } else {
-                            val intent = Intent(this, MapActivity::class.java)
+                            val intent = Intent(this, Itineraire::class.java)
                             intent.putExtra("currentPosition", barcode)
                             startActivity(intent)
                         }
@@ -143,13 +141,10 @@ class NavActivity : AppCompatActivity() {
     }
 
     private fun startCameraWithDelay() {
-        stopCamera()
-        handler.postDelayed({
             startCamera()
             handler.postDelayed({
                 stopCamera()
             }, stopDelay) // Arrêter la caméra après 1 seconde
-        }, startDelay) // Délai initial de 2 secondes
     }
 
     private fun placeModel(currentPoint: Point) {
