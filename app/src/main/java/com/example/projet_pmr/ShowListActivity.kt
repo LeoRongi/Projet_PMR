@@ -11,6 +11,7 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.Button
 import android.widget.EditText
+import android.widget.ImageView
 import android.widget.TextView
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
@@ -40,7 +41,7 @@ class ShowListActivity : AppCompatActivity() {
 
     private lateinit var sharedPreferences: SharedPreferences
     private lateinit var gson: Gson
-
+    private lateinit var urlAPI: String
 
 
 
@@ -56,7 +57,7 @@ class ShowListActivity : AppCompatActivity() {
         id = intent.getStringExtra("id").toString()
 
         itemList = mutableListOf()
-        val urlAPI = loadUrl()
+        urlAPI = loadUrl()
 
         retrieveListItems(id, urlAPI)
 
@@ -128,13 +129,13 @@ class ShowListActivity : AppCompatActivity() {
             return itemList.size
         }
 
-        inner class ItemViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView),
-            View.OnClickListener {
-
+        inner class ItemViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView), View.OnClickListener {
             private val textView: TextView = itemView.findViewById(R.id.textViewItem)
+            private val imageViewDelete: ImageView = itemView.findViewById(R.id.imageViewDeleteItem)
 
             init {
                 itemView.setOnClickListener(this)
+                imageViewDelete.setOnClickListener(this)
             }
 
             fun bind(item: String) {
@@ -142,10 +143,18 @@ class ShowListActivity : AppCompatActivity() {
             }
 
             override fun onClick(view: View) {
-                val item = itemList[adapterPosition]
-
+                if (view.id == R.id.imageViewDeleteItem) {
+                    val item = itemList[adapterPosition]
+                    delItem(item, urlAPI)
+                    itemList.remove(item)
+                    notifyDataSetChanged()
+                } else {
+                    // Handle item click
+                    val item = itemList[adapterPosition]
+                }
             }
         }
+
     }
 
     private fun retrieveListItems(id: String, urlAPI: String) {
@@ -251,7 +260,6 @@ class ShowListActivity : AppCompatActivity() {
             it.readText()
         }
         val cartographyArray = JSONArray(cartographyJson)
-        System.out.println(cartographyArray)
         logItems()
         for (item in itemList) {
 
@@ -291,6 +299,32 @@ class ShowListActivity : AppCompatActivity() {
         for (item in itemList) {
             Log.d("ListItem", "ID: ${item.id}, Label: ${item.label}, URL: ${item.url}, Checked: ${item.checked}")
         }
+    }
+
+    private fun delItem(item: ListItem, urlAPI: String) {
+        val url = "$urlAPI/lists/$id/items/${item.id}"
+
+        val requestQueue = Volley.newRequestQueue(this)
+        val request = object : JsonObjectRequest(
+            Request.Method.DELETE, url, null,
+            Response.Listener { response ->
+                // Item deleted successfully
+                itemList.remove(item)
+                recyclerView.adapter?.notifyDataSetChanged()
+            },
+            Response.ErrorListener { error ->
+                Toast.makeText(this, "API connection error: ${error.message}", Toast.LENGTH_LONG)
+                    .show()
+            }) {
+            override fun getHeaders(): MutableMap<String, String> {
+                val headers = HashMap<String, String>()
+                val token = getToken() // Get the identification token from preferences
+                headers["hash"] = token
+                return headers
+            }
+        }
+
+        requestQueue.add(request)
     }
 
 }
