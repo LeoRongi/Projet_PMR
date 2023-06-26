@@ -6,6 +6,9 @@
     android:layout_height="match_parent"
     tools:context=".MainActivity">
 
+
+
+
     <io.github.sceneview.ar.ArSceneView
         android:id="@+id/sceneView"
         android:layout_width="match_parent"
@@ -14,6 +17,13 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintBottom_toBottomOf="parent" />
+
+    <Button
+        android:id="@+id/returnToMapButton"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Revenir à la carte"
+        tools:ignore="MissingConstraints" />
 
     <Button
         android:id="@+id/scanButton"
@@ -26,5 +36,6 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintVertical_bias="0.882" />
+
 
 </androidx.constraintlayout.widget.ConstraintLayout>

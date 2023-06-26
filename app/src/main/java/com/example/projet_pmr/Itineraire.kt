@@ -93,6 +93,9 @@ val ligne = map.size
 val colonne = map[0].size
 val startPoint = Point(ligne - 1, colonne - 1)
 val endPoint = Point(7, colonne-1)
+private const val REQUEST_CODE = 1
+
+
 
 @Suppress("DEPRECATION")
 class Itineraire : AppCompatActivity() {
@@ -100,6 +103,7 @@ class Itineraire : AppCompatActivity() {
     private lateinit var coordinatesList: MutableList<Point>
     private lateinit var invertedCoordinatesList : MutableList<Point>
     private val relationTable = mutableMapOf<Point, String>()
+
 
     @SuppressLint("SetTextI18n", "UnsafeOptInUsageError")
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -271,10 +275,10 @@ class Itineraire : AppCompatActivity() {
             }
 
             //Listener du bouton de scan QRcode
-            qrCodeButton.setOnClickListener{
+            qrCodeButton.setOnClickListener {
                 val intent = Intent(applicationContext, NavActivity::class.java)
-                intent.putExtra("coordinatesList", ArrayList(optimalPath))
-                intent.putExtra("currentStep",currentStep)
+                intent.putExtra("optimalPath", ArrayList(optimalPath))
+                intent.putExtra("currentStep", currentStep)
                 startActivity(intent)
             }
         }

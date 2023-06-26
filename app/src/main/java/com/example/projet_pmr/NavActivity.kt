@@ -2,6 +2,7 @@ package com.example.projet_pmr
 
 import android.Manifest
 import android.annotation.SuppressLint
+import android.app.Activity
 import android.content.Intent
 import android.content.pm.PackageManager
 import android.graphics.Point
@@ -40,6 +41,7 @@ class NavActivity : AppCompatActivity() {
     private lateinit var modelNode: ArModelNode
     private lateinit var scanButton: Button
 
+
     private lateinit var cameraExecutor: ExecutorService
     private lateinit var barcodeScanner: BarcodeScanner
     private var isModelPlaced = false
@@ -57,6 +59,10 @@ class NavActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_nav)
+
+
+
+
 
         sceneView = findViewById<ArSceneView>(R.id.sceneView).apply {
             this.lightEstimationMode = LightEstimationMode.ENVIRONMENTAL_HDR_NO_REFLECTIONS
@@ -80,6 +86,11 @@ class NavActivity : AppCompatActivity() {
             .setBarcodeFormats(Barcode.FORMAT_QR_CODE)
             .build()
         barcodeScanner = BarcodeScanning.getClient(options)
+
+        val returnToMapButton : Button = findViewById(R.id.returnToMapButton)
+        returnToMapButton.setOnClickListener {
+            finish()
+        }
     }
 
     private fun allPermissionsGranted(): Boolean {
@@ -92,7 +103,8 @@ class NavActivity : AppCompatActivity() {
         if (isCameraRunning) return
 
         val intent = intent
-        val navigation = intent.getSerializableExtra("coordinatesList") as? MutableList<Point> ?: mutableListOf() //Récupération de l'itinéraire
+        val navigation = intent.getSerializableExtra("optimalPath") as List<List<Point>> //Récupération de l'itinéraire
+        val currentStep = intent.getIntExtra("currentStep",0)
 
         val cameraProviderFuture = ProcessCameraProvider.getInstance(this)
         cameraProviderFuture.addListener({
@@ -114,13 +126,11 @@ class NavActivity : AppCompatActivity() {
                     val currentPoint = Point(x.toInt()-48, y.toInt()-48)
                     Log.d("currentScan", currentPoint.toString())
                     Log.d("currentPath", navigation.toString())
-                    if (navigation != null) {
-                        if (currentPoint in navigation) {
+                    if (navigation[currentStep] != null) {
+                        if (currentPoint in navigation[currentStep]) {
                             placeModel(currentPoint)
                         } else {
-                            val intent = Intent(this, Itineraire::class.java)
-                            intent.putExtra("currentPosition", barcode)
-                            startActivity(intent)
+                            // JSP pas quoi faire sinon
                         }
                     }
                 }
@@ -159,9 +169,10 @@ class NavActivity : AppCompatActivity() {
         // Charger et placer l'objet uniquement lorsqu'on appuie sur le bouton
         val selectedRotation: Float
         val intent = intent
-        val navigation = intent.getSerializableExtra("coordinatesList") as? MutableList<Point> ?: mutableListOf() //Récupération de l'itinéraire
-        val posIndex: Int = navigation.indexOf(currentPoint)
-        val nextPos: Point = navigation.get(posIndex!! + 1) //Position à venir
+        val navigation = intent.getSerializableExtra("coordinatesList") as List<List<Point>> //Récupération de l'itinéraire
+        val currentStep = intent.getStringExtra("currentStep")!!.toInt()
+        val posIndex: Int = navigation[currentStep].indexOf(currentPoint)
+        val nextPos: Point = navigation[currentStep].get(posIndex!! + 1) //Position à venir
 
         if (currentPoint.x < nextPos.x) { //Si la prochaine position est derrière
             selectedRotation = 270f
