@@ -19,9 +19,7 @@
         <activity
             android:name=".NavActivity"
             android:exported="false" />
-        <activity
-            android:name=".MapActivity"
-            android:exported="false" />
+
         <activity
             android:name=".Menu"
             android:exported="false" />

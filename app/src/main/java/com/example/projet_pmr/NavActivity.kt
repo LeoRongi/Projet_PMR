@@ -2,6 +2,7 @@ package com.example.projet_pmr
 
 import android.Manifest
 import android.annotation.SuppressLint
+import android.app.Activity
 import android.content.Intent
 import android.content.pm.PackageManager
 import android.graphics.Point
@@ -39,6 +40,7 @@ class NavActivity : AppCompatActivity() {
     private lateinit var sceneView: ArSceneView
     private lateinit var modelNode: ArModelNode
     private lateinit var scanButton: Button
+
 
     private lateinit var cameraExecutor: ExecutorService
     private lateinit var barcodeScanner: BarcodeScanner
@@ -80,6 +82,11 @@ class NavActivity : AppCompatActivity() {
             .setBarcodeFormats(Barcode.FORMAT_QR_CODE)
             .build()
         barcodeScanner = BarcodeScanning.getClient(options)
+
+        val returnToMapButton : Button = findViewById(R.id.returnToMapButton)
+        returnToMapButton.setOnClickListener {
+            finish()
+        }
     }
 
     private fun allPermissionsGranted(): Boolean {
@@ -92,7 +99,8 @@ class NavActivity : AppCompatActivity() {
         if (isCameraRunning) return
 
         val intent = intent
-        val navigation = intent.getSerializableExtra("currentPath") as? MutableList<Point> ?: mutableListOf() //Récupération de l'itinéraire
+        val navigation = intent.getSerializableExtra("optimalPath") as List<List<Point>> //Récupération de l'itinéraire
+        val currentStep = intent.getIntExtra("currentStep",0)
 
         val cameraProviderFuture = ProcessCameraProvider.getInstance(this)
         cameraProviderFuture.addListener({
@@ -108,15 +116,20 @@ class NavActivity : AppCompatActivity() {
                 runOnUiThread {
                     Toast.makeText(this, "Scanned QR Code: $barcode", Toast.LENGTH_SHORT).show()
                     val x = barcode[0]
+                    Log.d("xcoord", barcode[0].toString())
+                    Log.d("xreel", x.toInt().toString())
                     val y = barcode[1]
-                    val currentPoint = Point(x.toInt(), y.toInt())
-                    if (navigation != null) {
-                        if (currentPoint in navigation) {
+                    val currentPoint = Point(x.toInt()-48, y.toInt()-48)
+                    Log.d("currentScan", currentPoint.toString())
+                    Log.d("currentPath", navigation[currentStep].toString())
+                    val isInPath: Boolean = currentPoint in navigation[currentStep]
+                    Log.d("isInPath", isInPath.toString())
+
+                    if (navigation[currentStep] != null) {
+                        if (currentPoint in navigation[currentStep]) {
                             placeModel(currentPoint)
                         } else {
-                            val intent = Intent(this, Itineraire::class.java)
-                            intent.putExtra("currentPosition", barcode)
-                            startActivity(intent)
+                            Toast.makeText(this, "Vous êtes perdus", Toast.LENGTH_SHORT).show()
                         }
                     }
                 }
@@ -155,18 +168,19 @@ class NavActivity : AppCompatActivity() {
         // Charger et placer l'objet uniquement lorsqu'on appuie sur le bouton
         val selectedRotation: Float
         val intent = intent
-        val navigation = intent.getSerializableExtra("currentPath") as? MutableList<Point> ?: mutableListOf() //Récupération de l'itinéraire
-        val posIndex: Int = navigation.indexOf(currentPoint)
-        val nextPos: Point = navigation.get(posIndex!! + 1) //Position à venir
+        val navigation = intent.getSerializableExtra("optimalPath") as List<List<Point>> //Récupération de l'itinéraire
+        val currentStep = intent.getIntExtra("currentStep",0)
+        val posIndex: Int = navigation[currentStep].indexOf(currentPoint)
+        val nextPos: Point = navigation[currentStep][posIndex!! + 1] //Position à venir
 
         if (currentPoint.x < nextPos.x) { //Si la prochaine position est derrière
             selectedRotation = 270f
         } else if (currentPoint.x > nextPos.x) { //Si la prochaine position est devant
             selectedRotation = 90f
         } else if (currentPoint.y < nextPos.y) { //Si la prochaine position est à gauche
-            selectedRotation = 180f
-        } else { //Si la prochaine position est à droite
             selectedRotation = 0f
+        } else { //Si la prochaine position est à droite
+            selectedRotation = 180f
         }
         modelNode = ArModelNode(PlacementMode.INSTANT).apply {
             loadModelGlbAsync(
