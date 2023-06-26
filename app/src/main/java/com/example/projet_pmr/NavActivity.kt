@@ -114,12 +114,13 @@ class NavActivity : AppCompatActivity() {
                 // Process the scanned QR code
                 Log.d(TAG, "Scanned QR Code: $barcode")
                 runOnUiThread {
-                    Toast.makeText(this, "Scanned QR Code: $barcode", Toast.LENGTH_SHORT).show()
-                    val x = barcode[0]
-                    Log.d("xcoord", barcode[0].toString())
+                    //Toast.makeText(this, "Scanned QR Code: $barcode", Toast.LENGTH_SHORT).show()
+                    val scannedCoords = barcode.split("_")  //Sépare les deux coordonnées (QR code de la forme x_y)
+                    val x = scannedCoords[0]
+                    Log.d("xcoord", x)  //Debug
                     Log.d("xreel", x.toInt().toString())
-                    val y = barcode[1]
-                    val currentPoint = Point(x.toInt()-48, y.toInt()-48)
+                    val y = scannedCoords[1]
+                    val currentPoint = Point(x.toInt(), y.toInt())
                     Log.d("currentScan", currentPoint.toString())
                     Log.d("currentPath", navigation[currentStep].toString())
                     val isInPath: Boolean = currentPoint in navigation[currentStep]
