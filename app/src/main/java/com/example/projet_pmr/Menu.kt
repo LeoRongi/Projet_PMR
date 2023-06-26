@@ -10,6 +10,7 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.Button
 import android.widget.EditText
+import android.widget.ImageView
 import android.widget.TextView
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
@@ -70,20 +71,8 @@ class Menu : AppCompatActivity() {
             }
         }
 
-
-
-
     }
 
-
-
-    // Méthode pour ajouter une nouvelle liste
-    private fun addNewList(listName: String , id: String) {
-        val newList = ListData.ItemList(id, listName)
-        listData.itemLists.add(newList)
-        saveData(listData)
-        recyclerView.adapter?.notifyDataSetChanged()
-    }
 
     // Méthode pour sauvegarder les données dans les SharedPreferences
     private fun saveData(data: ListData) {
@@ -126,9 +115,11 @@ class Menu : AppCompatActivity() {
             View.OnClickListener {
 
             private val textView: TextView = itemView.findViewById(R.id.textView)
+            private val imageViewDelete: ImageView = itemView.findViewById(R.id.imageViewDeleteItem)
 
             init {
                 itemView.setOnClickListener(this)
+                imageViewDelete.setOnClickListener(this)
             }
 
             fun bind(itemList: ListData.ItemList) {
@@ -136,14 +127,22 @@ class Menu : AppCompatActivity() {
             }
 
             override fun onClick(view: View) {
-                val itemList = itemLists[adapterPosition]
-
-                val intent = Intent(this@Menu, ShowListActivity::class.java)
-                intent.putExtra("id", itemList.id)
-                startActivity(intent)
+                when (view) {
+                    itemView -> {
+                        val itemList = itemLists[adapterPosition]
+                        val intent = Intent(this@Menu, ShowListActivity::class.java)
+                        intent.putExtra("id", itemList.id)
+                        startActivity(intent)
+                    }
+                    imageViewDelete -> {
+                        val itemList = itemLists[adapterPosition]
+                        delList(itemList)
+                    }
+                }
             }
         }
     }
+
 
     private fun retrieveUserLists(urlAPI: String) {
         val url = urlAPI+"lists"
@@ -241,6 +240,33 @@ class Menu : AppCompatActivity() {
         } catch (e: JSONException) {
             e.printStackTrace()
         }
+    }
+
+    private fun delList(itemList: ListData.ItemList) {
+        val urlAPI = loadUrl()
+        val url = "$urlAPI/lists/${itemList.id}"
+
+        val requestQueue = Volley.newRequestQueue(this)
+        val request = object : JsonObjectRequest(
+            Request.Method.DELETE, url, null,
+            Response.Listener { response ->
+                listData.itemLists.remove(itemList)
+                saveData(listData)
+                recyclerView.adapter?.notifyDataSetChanged()
+            },
+            Response.ErrorListener { error ->
+                Toast.makeText(this, "API connection error: ${error.message}", Toast.LENGTH_LONG)
+                    .show()
+            }) {
+            override fun getHeaders(): MutableMap<String, String> {
+                val headers = HashMap<String, String>()
+                val token = getToken()
+                headers["hash"] = token
+                return headers
+            }
+        }
+
+        requestQueue.add(request)
     }
 
 
