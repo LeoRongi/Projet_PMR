@@ -92,7 +92,7 @@ class NavActivity : AppCompatActivity() {
         if (isCameraRunning) return
 
         val intent = intent
-        val navigation = intent.getSerializableExtra("currentPath") as? MutableList<Point> ?: mutableListOf() //Récupération de l'itinéraire
+        val navigation = intent.getSerializableExtra("coordinatesList") as? MutableList<Point> ?: mutableListOf() //Récupération de l'itinéraire
 
         val cameraProviderFuture = ProcessCameraProvider.getInstance(this)
         cameraProviderFuture.addListener({
@@ -108,8 +108,12 @@ class NavActivity : AppCompatActivity() {
                 runOnUiThread {
                     Toast.makeText(this, "Scanned QR Code: $barcode", Toast.LENGTH_SHORT).show()
                     val x = barcode[0]
+                    Log.d("xcoord", barcode[0].toString())
+                    Log.d("xreel", x.toInt().toString())
                     val y = barcode[1]
-                    val currentPoint = Point(x.toInt(), y.toInt())
+                    val currentPoint = Point(x.toInt()-48, y.toInt()-48)
+                    Log.d("currentScan", currentPoint.toString())
+                    Log.d("currentPath", navigation.toString())
                     if (navigation != null) {
                         if (currentPoint in navigation) {
                             placeModel(currentPoint)
@@ -155,7 +159,7 @@ class NavActivity : AppCompatActivity() {
         // Charger et placer l'objet uniquement lorsqu'on appuie sur le bouton
         val selectedRotation: Float
         val intent = intent
-        val navigation = intent.getSerializableExtra("currentPath") as? MutableList<Point> ?: mutableListOf() //Récupération de l'itinéraire
+        val navigation = intent.getSerializableExtra("coordinatesList") as? MutableList<Point> ?: mutableListOf() //Récupération de l'itinéraire
         val posIndex: Int = navigation.indexOf(currentPoint)
         val nextPos: Point = navigation.get(posIndex!! + 1) //Position à venir
 
